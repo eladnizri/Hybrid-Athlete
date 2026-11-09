@@ -1,7 +1,7 @@
 <!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hybrid Athlete</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%231f5a41'/><path d='M30 62c4-20 16-34 20-34s16 14 20 34' stroke='%23fff' stroke-width='6' fill='none' stroke-linecap='round'/><circle cx='50' cy='28' r='6' fill='%23fff'/></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 [hidden]{display:none!important}
@@ -9,24 +9,24 @@
 --bg:linear-gradient(160deg,#d3ddd4,#a3b9a9);
 --card:rgba(255,255,255,.6);--bar:rgba(255,255,255,.7);--field:rgba(255,255,255,.7);--line:rgba(255,255,255,.7);
 --text:#1a1a1a;--text2:#3a403c;
---accent:#1f5a41;--red:#a52626;
+--accent:#1f5a41;--accent-light:#e8f5ee;--red:#a52626;
 --ring-cal:#b8355c;--ring-min:#1f5a41;--ring-km:#0b7a99;
 --radius:20px;--radius-sm:14px;--pill:50px;
 --safe-b:env(safe-area-inset-bottom,0px);
 --shadow:0 4px 24px rgba(0,0,0,.08)
 }
-/* opaque surfaces for people who turn transparency down or contrast up */
 @media (prefers-reduced-transparency:reduce),(prefers-contrast:more){:root{--card:#f3f6f3;--bar:#f3f6f3;--field:#fff;--line:#5c6b61}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
 color:var(--text);min-height:100dvh;line-height:1.4;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 padding-bottom:calc(150px + var(--safe-b))}
-/* fixed layer instead of background-attachment:fixed, which iOS Safari ignores */
 body::before{content:'';position:fixed;inset:0;background:var(--bg);z-index:-1}
-button,input,select{font:inherit;color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-input::placeholder{color:var(--text2);opacity:.7}
+input::placeholder,textarea::placeholder{color:var(--text2);opacity:.7}
+.icon{width:20px;height:20px;fill:currentColor;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-lg{width:24px;height:24px}
 
 .screen{display:none;padding:16px 16px 24px;max-width:500px;margin:0 auto}
 .screen.active{display:block;animation:fadeIn .3s ease-out}
@@ -37,7 +37,6 @@ h2{font-size:20px;font-weight:700;margin:20px 0 10px}
 .sub{color:var(--text2);font-size:15px;margin-top:2px}
 .head{margin-bottom:20px}
 
-/* content layer: plain translucent surfaces, no blur */
 .card,.activity-card,.plan-card,.stat{background:var(--card);border:1px solid var(--line);
 border-radius:var(--radius);box-shadow:var(--shadow)}
 .card{padding:16px;margin-bottom:12px}
@@ -45,8 +44,7 @@ border-radius:var(--radius);box-shadow:var(--shadow)}
 
 /* === SETUP === */
 #welcome-screen.active{display:flex;flex-direction:column;align-items:center;min-height:100dvh;padding:40px 24px;text-align:center}
-.welcome-icon{width:84px;height:84px;border-radius:26px;display:flex;align-items:center;justify-content:center;
-font-size:42px;margin-bottom:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.welcome-logo{width:84px;height:84px;margin-bottom:20px}
 .setup-form{width:100%;max-width:380px;text-align:right;margin-top:28px}
 .field{margin-bottom:16px}
 label,.label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
@@ -59,15 +57,33 @@ background-repeat:no-repeat;background-position:left 14px center}
 .err{color:var(--red);font-size:13px;font-weight:600;margin-top:6px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .sport-btn{padding:12px 6px;min-height:76px;border-radius:var(--radius-sm);border:2px solid var(--line);
-background:var(--card);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.sport-btn span{font-size:26px}
+background:var(--card);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sport-btn .icon{width:28px;height:28px}
 .goal-chips{display:flex;flex-wrap:wrap;gap:8px}
 .goal-chip{min-height:44px;padding:8px 16px;border-radius:var(--pill);border:2px solid var(--line);
 background:var(--card);font-size:15px;font-weight:500}
 .sel{border-color:var(--accent);background:#fff;font-weight:700}
 .goal-chip.sel::before{content:'✓ '}
 .note{font-size:13px;color:var(--text2);text-align:center;margin-top:12px}
+
+/* API key section */
+.api-section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.api-section summary{cursor:pointer;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;list-style:none;min-height:44px}
+.api-section summary::-webkit-details-marker{display:none}
+.api-section summary .icon{color:var(--accent)}
+.api-section[open] summary .chevron{transform:rotate(180deg)}
+.api-guide{margin-top:16px}
+.api-step{display:flex;gap:12px;margin-bottom:16px;padding:12px;background:rgba(255,255,255,.5);border-radius:var(--radius-sm)}
+.api-step-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.api-step-text{font-size:14px;line-height:1.5;flex:1}
+.api-step-text a{color:var(--accent);text-decoration:underline}
+.api-input-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.api-input-row .input{flex:1}
+.api-status{font-size:13px;margin-top:8px;font-weight:600}
+.api-status.ok{color:var(--accent)}
+.api-status.err{color:var(--red)}
 
 .btn{width:100%;min-height:50px;padding:12px;border-radius:var(--pill);border:1px solid var(--line);
 background:var(--card);font-size:17px;font-weight:600;margin-top:10px}
@@ -115,8 +131,17 @@ font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px so
 .ring-val{font-size:22px;font-weight:700;line-height:1.1}
 .ring-label{font-size:13px;color:var(--text2)}
 
+/* today planned workout card */
+.today-plan{display:flex;align-items:center;gap:14px;padding:16px;cursor:pointer}
+.today-plan .icon{width:28px;height:28px;color:var(--accent)}
+.today-plan-info{flex:1}
+.today-plan-title{font-size:17px;font-weight:700}
+.today-plan-desc{font-size:14px;color:var(--text2);margin-top:2px}
+.today-plan .btn{width:auto;padding:8px 20px;margin:0;min-height:40px;font-size:15px}
+
 .activity-card,.plan-card{padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
-.act-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#fff}
+.act-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+.act-icon .icon{width:22px;height:22px;color:var(--accent)}
 .act-info,.plan-info{flex:1;min-width:0}
 .act-name,.plan-type{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .act-detail,.plan-desc{font-size:14px;color:var(--text2);margin-top:2px}
@@ -124,7 +149,7 @@ font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px so
 .act-metric b{font-size:17px;display:block}
 .act-metric span{font-size:12px;color:var(--text2)}
 .empty{text-align:center;padding:36px 20px;color:var(--text2);font-size:15px;line-height:1.5}
-.empty-icon{font-size:44px;margin-bottom:8px}
+.empty-icon{margin-bottom:8px}
 .empty .btn{width:auto;padding:12px 28px}
 
 /* === WEEKLY === */
@@ -137,6 +162,9 @@ font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px so
 .bar-col.today{color:var(--text);font-weight:700}
 
 /* === PLAN === */
+.plan-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.plan-tab{min-height:44px;padding:8px 18px;border-radius:var(--pill);border:2px solid var(--line);background:var(--card);font-size:15px;font-weight:600;white-space:nowrap}
+.plan-tab.sel{border-color:var(--accent);background:#fff;color:var(--accent)}
 .plan-day{width:44px;text-align:center;flex-shrink:0}
 .plan-day span{font-size:12px;color:var(--text2);font-weight:600;display:block}
 .plan-day b{font-size:22px}
@@ -148,14 +176,105 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 .plan-check[aria-pressed=true]::before{content:'✓';background:var(--accent);border-color:var(--accent)}
 .done .plan-info{opacity:.6;text-decoration:line-through}
 
+/* plan editor modal */
+.plan-edit-section{margin-bottom:20px}
+.plan-edit-section h3{font-size:16px;font-weight:700;margin-bottom:10px}
+.exercise-row{background:rgba(255,255,255,.5);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px}
+.exercise-row .input{margin-top:6px}
+.sets-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:center;margin-top:8px;font-size:14px}
+.sets-grid .input{min-height:40px;padding:8px 10px;font-size:15px;text-align:center}
+.add-exercise-btn{min-height:44px;padding:8px 16px;border:2px dashed var(--line);border-radius:var(--radius-sm);background:none;font-size:14px;font-weight:600;color:var(--text2);width:100%;margin-top:4px}
+
+/* === WORKOUT MODE === */
+.workout-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;flex-direction:column;overflow:hidden}
+.workout-overlay.show{display:flex}
+.wo-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;flex-shrink:0}
+.wo-title{font-size:18px;font-weight:700}
+.wo-sets-label{font-size:14px;color:var(--text2)}
+.wo-close{width:44px;height:44px;border:none;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.wo-progress{height:4px;background:rgba(0,0,0,.1);margin:0 16px;border-radius:2px;flex-shrink:0}
+.wo-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.wo-dots{display:flex;justify-content:center;gap:8px;padding:12px;flex-shrink:0}
+.wo-dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,.15)}
+.wo-dot.active{background:var(--accent)}
+.wo-dot.completed{background:var(--accent);opacity:.5}
+.wo-carousel{flex:1;overflow:hidden;position:relative}
+.wo-slides{display:flex;transition:transform .3s ease-out;height:100%}
+.wo-slide{min-width:100%;padding:0 16px;overflow-y:auto}
+.wo-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.wo-ex-header{text-align:center;margin-bottom:16px}
+.wo-ex-sub{font-size:14px;color:var(--text2)}
+.wo-ex-name{font-size:26px;font-weight:800;margin:4px 0}
+.wo-muscles{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.wo-muscle{padding:6px 14px;border-radius:var(--pill);background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600}
+.wo-muscle.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wo-reps-chip{display:inline-block;padding:6px 16px;border-radius:var(--pill);border:2px dashed var(--line);font-size:14px;margin:8px 0}
+.wo-history{font-size:13px;color:var(--text2);text-align:center;margin:8px 0}
+.wo-suggestion{color:var(--accent);font-weight:600;font-size:14px;text-align:center;margin:4px 0}
+.wo-set-counter{font-size:15px;font-weight:700;color:var(--accent);text-align:right;margin-bottom:8px}
+
+.wo-set{background:var(--card);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.wo-set.completed{opacity:.6}
+.wo-set-check{width:44px;height:44px;border:none;background:rgba(255,255,255,.8);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wo-set-check.done{background:var(--accent);color:#fff}
+.wo-set-check .icon{width:22px;height:22px}
+.wo-set-label{font-size:14px;font-weight:600;color:var(--text2);min-width:40px;text-align:center;flex-shrink:0}
+.wo-set-fields{flex:1;display:flex;gap:12px;justify-content:center;align-items:center}
+.wo-stepper{display:flex;align-items:center;gap:4px;flex-direction:column}
+.wo-stepper-row{display:flex;align-items:center;gap:4px}
+.wo-stepper-btn{width:40px;height:40px;border-radius:12px;border:none;background:rgba(255,255,255,.8);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.wo-stepper-btn:active{background:var(--accent-light)}
+.wo-stepper-val{font-size:22px;font-weight:700;min-width:48px;text-align:center}
+.wo-stepper-label{font-size:12px;color:var(--text2)}
+
+.wo-card-actions{display:flex;justify-content:center;gap:16px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);margin-top:12px}
+.wo-card-actions button{background:none;border:none;font-size:13px;color:var(--text2);font-weight:600;min-height:44px;padding:8px 12px}
+.wo-footer{padding:16px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.wo-footer textarea{width:100%;min-height:44px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--field);font-size:15px;resize:none}
+.wo-footer-btns{display:flex;gap:8px}
+.wo-footer-btns .btn{margin:0}
+
 /* === PROFILE === */
+.setting-badge{font-size:13px;padding:4px 12px;border-radius:var(--pill);font-weight:600}
+.setting-badge.on{background:var(--accent-light);color:var(--accent)}
+.setting-badge.off{background:rgba(0,0,0,.06);color:var(--text2)}
 .goals-row{display:flex;justify-content:space-between;gap:12px;padding-top:14px;margin-top:14px;border-top:1px solid rgba(0,0,0,.1);font-size:16px}
 .goals-row span:last-child{color:var(--text2);text-align:left}
 </style></head><body>
 
+<!-- SVG icon defs -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-run" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></symbol>
+<symbol id="i-bike" viewBox="0 0 24 24"><path d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5zm5.8-10l2.4-2.4.8.8c1.3 1.3 3 2.1 5 2.1V9c-1.5 0-2.7-.6-3.6-1.5l-1.9-1.9c-.5-.4-1-.6-1.6-.6s-1.1.2-1.4.6L7.8 8.4c-.4.4-.6.9-.6 1.4 0 .6.2 1.1.6 1.4L11 14v5h2v-6.2l-2.2-2.3zM19 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></symbol>
+<symbol id="i-swim" viewBox="0 0 24 24"><path d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.08.64-2.19.64-1.11 0-1.73-.37-2.19-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.08.64-2.19.64v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.19.64c.37.22.6.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C10.19 4.17 9.39 3.5 8.5 3.5c-.35 0-.69.08-1 .24L5 5V7l3.5-1.33L9.87 9.2C8.49 10 7.48 10.99 7.04 12.27c.41-.18.82-.27 1.63-.27zm6.33-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></symbol>
+<symbol id="i-tri" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
+<symbol id="i-gym" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></symbol>
+<symbol id="i-walk" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></symbol>
+<symbol id="i-hike" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM17.5 10.78c-1.23-.36-2.25-.1-3.04.49L12.9 8.1l.76-2.28c.21-.65-.12-1.33-.78-1.55-.65-.21-1.33.12-1.55.78L9.14 11.8l2.53 2.13-.85 3.55-3.32-1.68c-.66-.34-1.47-.06-1.81.61-.34.66-.07 1.47.6 1.8l5.22 2.64c.52.26 1.16.14 1.54-.29l3.54-4.05c.53-.62.45-1.57-.17-2.1l-1.97-1.65 1.28-1.09c.53-.45.79-1.13.64-1.79z"/><path d="M7.5 11c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+<symbol id="i-rest" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></symbol>
+<symbol id="i-plan" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></symbol>
+<symbol id="i-person" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+<symbol id="i-today" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><circle cx="12" cy="12" r="5"/></symbol>
+</svg>
+
 <!-- SETUP (first launch + edit) -->
 <main id="welcome-screen" class="screen">
-<div class="welcome-icon" id="welcome-icon" aria-hidden="true">🏋️</div>
+<svg class="welcome-logo" viewBox="0 0 100 100" aria-hidden="true">
+<circle cx="50" cy="50" r="46" fill="#1f5a41"/>
+<path d="M30 62c4-20 16-34 20-34s16 14 20 34" stroke="#fff" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+<circle cx="50" cy="28" r="5.5" fill="#fff"/>
+<path d="M38 50l-6 10M62 50l6 10" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
 <h1 id="setup-title">Hybrid Athlete</h1>
 <p class="sub" id="setup-sub">יומן אימונים אישי</p>
 <form class="setup-form" onsubmit="event.preventDefault();saveSetup()" novalidate>
@@ -166,13 +285,13 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 </div>
 <div class="field">
 <span class="label" id="sport-label">ספורט עיקרי</span>
-<div class="row3" role="group" aria-labelledby="sport-label">
-<button type="button" class="sport-btn" data-sport="running" onclick="pickSport(this)"><span aria-hidden="true">🏃</span>ריצה</button>
-<button type="button" class="sport-btn" data-sport="cycling" onclick="pickSport(this)"><span aria-hidden="true">🚴</span>רכיבה</button>
-<button type="button" class="sport-btn" data-sport="swimming" onclick="pickSport(this)"><span aria-hidden="true">🏊</span>שחייה</button>
-<button type="button" class="sport-btn" data-sport="triathlon" onclick="pickSport(this)"><span aria-hidden="true">🏅</span>טריאתלון</button>
-<button type="button" class="sport-btn" data-sport="gym" onclick="pickSport(this)"><span aria-hidden="true">🏋️</span>חדר כושר</button>
-<button type="button" class="sport-btn" data-sport="other" onclick="pickSport(this)"><span aria-hidden="true">⚡</span>אחר</button>
+<div class="sport-grid" role="group" aria-labelledby="sport-label">
+<button type="button" class="sport-btn" data-sport="running" onclick="pickSport(this)"><svg class="icon"><use href="#i-run"/></svg>ריצה</button>
+<button type="button" class="sport-btn" data-sport="cycling" onclick="pickSport(this)"><svg class="icon"><use href="#i-bike"/></svg>רכיבה</button>
+<button type="button" class="sport-btn" data-sport="swimming" onclick="pickSport(this)"><svg class="icon"><use href="#i-swim"/></svg>שחייה</button>
+<button type="button" class="sport-btn" data-sport="triathlon" onclick="pickSport(this)"><svg class="icon"><use href="#i-tri"/></svg>טריאתלון</button>
+<button type="button" class="sport-btn" data-sport="gym" onclick="pickSport(this)"><svg class="icon"><use href="#i-gym"/></svg>חדר כושר</button>
+<button type="button" class="sport-btn" data-sport="other" onclick="pickSport(this)"><svg class="icon"><use href="#i-bolt"/></svg>אחר</button>
 </div>
 </div>
 <div class="field">
@@ -194,6 +313,27 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="race">תחרות</button>
 </div>
 </div>
+
+<!-- API key section -->
+<details class="api-section" id="api-section">
+<summary><svg class="icon"><use href="#i-key"/></svg> חיבור API חיצוני (לא חובה) <svg class="icon chevron" style="margin-right:auto"><use href="#i-chevron"/></svg></summary>
+<div class="api-guide">
+<p style="font-size:14px;color:var(--text2);margin-bottom:12px">חיבור ל-API חיצוני מאפשר סנכרון אוטומטי של נתוני אימונים. בצע את השלבים הבאים:</p>
+<div class="api-step"><div class="api-step-num">1</div><div class="api-step-text">היכנס לאתר השירות (למשל Garmin Connect, Strava, או כל ספק אחר) ונווט להגדרות החשבון שלך.</div></div>
+<div class="api-step"><div class="api-step-num">2</div><div class="api-step-text">חפש את סעיף "API" או "Developer" או "Apps" והפעל גישת API. חלק מהשירותים דורשים רישום אפליקציה.</div></div>
+<div class="api-step"><div class="api-step-num">3</div><div class="api-step-text">העתק את מפתח ה-API (API Key) שנוצר. <strong>שים לב:</strong> המפתח נשמר במכשיר הזה בלבד ולא נשלח לשום מקום.</div></div>
+<div class="api-step"><div class="api-step-num">4</div><div class="api-step-text">הדבק את המפתח בשדה למטה ולחץ ״שמור״.</div></div>
+<div class="field" style="margin-bottom:0">
+<label for="s-api-key">מפתח API</label>
+<div class="api-input-row">
+<input class="input" type="password" id="s-api-key" placeholder="הדבק את המפתח כאן" autocomplete="off" spellcheck="false">
+<button type="button" class="btn" style="width:auto;min-height:48px;padding:0 20px;margin:0" onclick="saveApiKey()">שמור</button>
+</div>
+<div class="api-status" id="api-status"></div>
+</div>
+</div>
+</details>
+
 <button class="btn primary" id="setup-save">בואו נתחיל</button>
 <button type="button" class="btn" id="setup-cancel" onclick="show('settings')" hidden>ביטול</button>
 <p class="note">הפרטים נשמרים במכשיר הזה בלבד</p>
@@ -217,6 +357,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div><div class="ring-val" id="ring-km">0</div><div class="ring-label">ק״מ מתוך 5</div></div></div>
 </div>
 </div>
+<div id="today-plan-card"></div>
 <h2>אימונים אחרונים</h2>
 <div id="activities-list"></div>
 </main>
@@ -236,7 +377,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 
 <!-- PLAN -->
 <main id="plan-screen" class="screen">
-<div class="head"><h1>תוכנית אימונים</h1><p class="sub" id="plan-sub">תבנית שבועית לפי הספורט שלך</p></div>
+<div class="head"><h1>תוכנית אימונים</h1><p class="sub" id="plan-sub">תכנן את האימונים שלך לשבוע</p></div>
 <div id="plan-content"></div>
 </main>
 
@@ -254,6 +395,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div class="stat"><b id="s-weight"></b><span>ק״ג</span></div>
 </div>
 <div class="goals-row"><span>יעדים</span><span id="s-goals"></span></div>
+<div class="goals-row"><span>API</span><span id="s-api-status"></span></div>
 </div>
 <button class="btn" onclick="openEdit()">עריכת פרטים</button>
 <button class="btn danger" id="reset-btn" onclick="askReset(true)">איפוס נתונים</button>
@@ -261,10 +403,10 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <p>כל האימונים והפרטים יימחקו מהמכשיר הזה. אי אפשר לשחזר אותם.</p>
 <div class="row"><button class="btn" onclick="askReset(false)">ביטול</button><button class="btn danger" onclick="resetApp()">מחק הכול</button></div>
 </div>
-<p class="note">Hybrid Athlete v1.1 · הנתונים נשמרים במכשיר הזה בלבד</p>
+<p class="note">Hybrid Athlete v2.0 · הנתונים נשמרים במכשיר הזה בלבד</p>
 </main>
 
-<button class="fab" id="fab" onclick="openAddActivity()" aria-label="הוסף אימון">+</button>
+<button class="fab" id="fab" onclick="openAddActivity()" aria-label="הוסף אימון"><svg class="icon icon-lg" style="fill:#fff"><use href="#i-plus"/></svg></button>
 
 <!-- ADD ACTIVITY SHEET -->
 <div class="modal-overlay" id="add-modal" onclick="if(event.target===this)closeAddActivity()">
@@ -274,13 +416,13 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div class="row">
 <div class="field"><label for="f-type">סוג</label>
 <select class="input" id="f-type">
-<option value="running">🏃 ריצה</option>
-<option value="cycling">🚴 רכיבה</option>
-<option value="swimming">🏊 שחייה</option>
-<option value="gym">🏋️ חדר כושר</option>
-<option value="walking">🚶 הליכה</option>
-<option value="hiking">🥾 טיול</option>
-<option value="other">⚡ אחר</option>
+<option value="running">ריצה</option>
+<option value="cycling">רכיבה</option>
+<option value="swimming">שחייה</option>
+<option value="gym">חדר כושר</option>
+<option value="walking">הליכה</option>
+<option value="hiking">טיול</option>
+<option value="other">אחר</option>
 </select></div>
 <div class="field"><label for="f-date">תאריך</label><input class="input" type="date" id="f-date"></div>
 </div>
@@ -298,17 +440,46 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 </form>
 </div>
 
+<!-- PLAN EDITOR MODAL -->
+<div class="modal-overlay" id="plan-edit-modal" onclick="if(event.target===this)closePlanEdit()">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="plan-edit-title" style="max-height:95dvh">
+<div class="modal-handle"></div>
+<h2 id="plan-edit-title">עריכת אימון</h2>
+<div id="plan-edit-content"></div>
+<div class="row" style="margin-top:12px"><button type="button" class="btn" onclick="closePlanEdit()">ביטול</button><button class="btn primary" onclick="savePlanSession()">שמור</button></div>
+</div>
+</div>
+
+<!-- WORKOUT MODE -->
+<div class="workout-overlay" id="workout-mode">
+<div class="wo-header">
+<button class="wo-close" onclick="cancelWorkout()" aria-label="סגור"><svg class="icon"><use href="#i-close"/></svg></button>
+<div class="wo-title" id="wo-title"></div>
+<div class="wo-sets-label" id="wo-sets-label"></div>
+</div>
+<div class="wo-progress"><div class="wo-progress-fill" id="wo-progress-fill"></div></div>
+<div class="wo-dots" id="wo-dots"></div>
+<div class="wo-carousel"><div class="wo-slides" id="wo-slides"></div></div>
+<div class="wo-footer">
+<textarea id="wo-note" placeholder="הערה לאימון (אופציונלי)" rows="1"></textarea>
+<div class="wo-footer-btns">
+<button class="btn" style="flex:1" onclick="cancelWorkout()">ביטול</button>
+<button class="btn primary" style="flex:1.2" onclick="finishWorkout()">סיום אימון</button>
+</div>
+</div>
+</div>
+
 <div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button id="toast-undo" hidden>בטל</button></div>
 
 <nav class="tab-bar" id="tab-bar" aria-label="ניווט ראשי">
 <button class="tab" data-tab="today" onclick="show('today')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>היום</button>
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-today"/></svg>היום</button>
 <button class="tab" data-tab="weekly" onclick="show('weekly')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>שבועי</button>
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>שבועי</button>
 <button class="tab" data-tab="plan" onclick="show('plan')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>תוכנית</button>
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plan"/></svg>תוכנית</button>
 <button class="tab" data-tab="settings" onclick="show('settings')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>פרופיל</button>
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-person"/></svg>פרופיל</button>
 </nav>
 
 <script>
@@ -318,15 +489,15 @@ const store={
   set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-// local calendar date; toISOString() alone is UTC and gives yesterday after midnight in Israel
 const ymd=d=>new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
-const TYPES={running:['🏃','ריצה'],cycling:['🚴','רכיבה'],swimming:['🏊','שחייה'],triathlon:['🏅','טריאתלון'],
-  gym:['🏋️','חדר כושר'],walking:['🚶','הליכה'],hiking:['🥾','טיול'],other:['⚡','אחר']};
+const TYPES={running:['#i-run','ריצה'],cycling:['#i-bike','רכיבה'],swimming:['#i-swim','שחייה'],triathlon:['#i-tri','טריאתלון'],
+  gym:['#i-gym','חדר כושר'],walking:['#i-walk','הליכה'],hiking:['#i-hike','טיול'],other:['#i-bolt','אחר']};
 const GOALS={endurance:'סיבולת',speed:'מהירות',weight:'ירידה במשקל',muscle:'בניית שריר',health:'בריאות',race:'תחרות'};
 const DAYS=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
 let profile=store.get('ha_profile',null);
-// newest first, so every list can just take the head
 const acts=()=>store.get('ha_activities',[]).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+
+function iconHtml(ref,cls){return `<svg class="icon ${cls||''}" aria-hidden="true"><use href="${ref}"/></svg>`}
 
 // --- Navigation ---
 function show(name){
@@ -372,10 +543,15 @@ function fillForm(p){
   document.querySelectorAll('.sport-btn').forEach(b=>setSel(b,b.dataset.sport===obSport));
   document.querySelectorAll('.goal-chip').forEach(b=>setSel(b,obGoals.includes(b.dataset.goal)));
   $('setup-title').textContent=editing?'עריכת פרטים':'Hybrid Athlete';
-  $('setup-sub').hidden=$('welcome-icon').hidden=editing;
+  $('setup-sub').hidden=editing;
+  document.querySelector('.welcome-logo').style.display=editing?'none':'';
   $('setup-cancel').hidden=!editing;
   $('setup-save').textContent=editing?'שמור שינויים':'בואו נתחיל';
   $('name-err').hidden=true;
+  const key=store.get('ha_api_key','');
+  $('s-api-key').value=key?'••••••••':'';
+  const st=$('api-status');
+  if(key){st.textContent='מפתח שמור';st.className='api-status ok'}else{st.textContent='';st.className='api-status'}
 }
 function openEdit(){fillForm(profile);show('welcome')}
 function saveSetup(){
@@ -387,6 +563,14 @@ function saveSetup(){
   store.set('ha_profile',profile);
   show(editing?'settings':'today');
   if(editing)toast('הפרטים נשמרו');
+}
+function saveApiKey(){
+  const v=$('s-api-key').value.trim();
+  const st=$('api-status');
+  if(!v||v==='••••••••'){st.textContent='הכנס מפתח תקין';st.className='api-status err';return}
+  store.set('ha_api_key',v);
+  $('s-api-key').value='••••••••';
+  st.textContent='המפתח נשמר במכשיר';st.className='api-status ok';
 }
 
 // --- Today ---
@@ -403,8 +587,9 @@ function loadToday(){
   $('ring-min').textContent=Math.round(min);
   $('ring-km').textContent=km.toFixed(1);
   drawRings([[58,'cal',cal/600],[45,'min',min/30],[32,'km',km/5]]);
+  renderTodayPlan();
   $('activities-list').innerHTML=listHtml(all.slice(0,5),
-    '<div class="empty-icon" aria-hidden="true">🏃</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>');
+    `<div class="empty-icon">${iconHtml('#i-run','icon-lg')}</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>`);
 }
 function drawRings(rings){
   $('rings-svg').innerHTML=rings.map(([r,name,pct])=>{
@@ -412,11 +597,42 @@ function drawRings(rings){
     return`<circle ${s} stroke-opacity=".15"/><circle ${s} stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(pct,1))}" transform="rotate(-90 70 70)"/>`;
   }).join('');
 }
+
+function renderTodayPlan(){
+  const plan=store.get('ha_plan',null);
+  const dayIdx=new Date().getDay();
+  if(!plan||!plan.sessions){
+    $('today-plan-card').innerHTML='';return;
+  }
+  const session=plan.sessions[dayIdx];
+  if(!session){
+    $('today-plan-card').innerHTML=`<div class="card today-plan">${iconHtml('#i-rest','icon-lg')}<div class="today-plan-info"><div class="today-plan-title">יום מנוחה</div><div class="today-plan-desc">אין אימון מתוכנן להיום</div></div></div>`;
+    return;
+  }
+  const isStrength=session.type==='strength';
+  const desc=isStrength?(session.exercises||[]).length+' תרגילים':sessionDesc(session);
+  $('today-plan-card').innerHTML=`<div class="card today-plan" onclick="${isStrength?`startWorkout(${dayIdx})`:'openAddActivity()'}">
+${iconHtml(isStrength?'#i-gym':(session.type==='cycling'?'#i-bike':'#i-run'),'icon-lg')}
+<div class="today-plan-info"><div class="today-plan-title">${esc(session.name||TYPES[session.type]?.[1]||'אימון')}</div>
+<div class="today-plan-desc">${esc(desc)}</div></div>
+${isStrength?'<button class="btn primary" onclick="event.stopPropagation();startWorkout('+dayIdx+')">התחל אימון</button>':''}
+</div>`;
+}
+
+function sessionDesc(s){
+  const parts=[];
+  if(s.distance)parts.push(s.distance+' ק״מ');
+  if(s.pace)parts.push(s.pace+' דק׳/ק״מ');
+  if(s.zone)parts.push('Zone '+s.zone);
+  if(s.duration)parts.push(s.duration+' דק׳');
+  return parts.join(' · ')||'אימון';
+}
+
 function listHtml(list,empty){
   if(!list.length)return`<div class="empty">${empty}</div>`;
   return list.map(a=>{
     const [icon,label]=TYPES[a.type]||TYPES.other;
-    return`<div class="activity-card"><div class="act-icon" aria-hidden="true">${icon}</div>
+    return`<div class="activity-card"><div class="act-icon">${iconHtml(icon)}</div>
 <div class="act-info"><div class="act-name">${esc(a.name||label)}</div>
 <div class="act-detail">${formatDate(a.date)}${a.duration?' · '+Math.round(a.duration)+' דק׳':''}</div></div>
 ${a.distance?`<div class="act-metric"><b>${a.distance.toFixed(1)}</b><span>ק״מ</span></div>`:''}</div>`;
@@ -437,7 +653,7 @@ function openAddActivity(){
   $('f-dur').focus();
 }
 function closeAddActivity(){$('add-modal').classList.remove('show')}
-addEventListener('keydown',e=>{if(e.key==='Escape')closeAddActivity()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeAddActivity();closePlanEdit()}});
 function saveActivity(){
   const num=id=>parseFloat($(id).value)||null;
   const duration=num('f-dur');
@@ -452,7 +668,7 @@ function saveActivity(){
 }
 function refresh(){loadToday();loadWeekly()}
 
-// --- Weekly (last 7 days, today last) ---
+// --- Weekly ---
 function loadWeekly(){
   const days=Array.from({length:7},(_,i)=>{const x=new Date();x.setDate(x.getDate()-6+i);return x});
   const keys=days.map(ymd),week=acts().filter(a=>a.date>=keys[0]&&a.date<=keys[6]);
@@ -464,39 +680,331 @@ function loadWeekly(){
   const mins=keys.map(k=>Math.round(week.filter(a=>a.date===k).reduce((s,a)=>s+(a.duration||0),0)));
   const max=Math.max(...mins,1);
   $('week-bars').innerHTML=mins.map((m,i)=>`<div class="bar-col${i===6?' today':''}">${m||''}<div class="bar" style="height:${Math.round(m/max*90)}px"></div>${DAYS[days[i].getDay()]}</div>`).join('');
-  $('week-activities').innerHTML=listHtml(week,'<p>עוד לא נרשמו אימונים ב-7 הימים האחרונים</p>');
+  $('week-activities').innerHTML=listHtml(week,`<p>עוד לא נרשמו אימונים ב-7 הימים האחרונים</p>`);
 }
 
-// --- Plan (Sunday–Saturday template; ticks saved per week) ---
+// --- Plan ---
 function weekStart(){const s=new Date();s.setDate(s.getDate()-s.getDay());return s}
+
 function renderPlan(){
   const start=weekStart(),key=ymd(start);
   let plan=store.get('ha_plan',null);
-  if(!plan){
-    $('plan-content').innerHTML='<div class="empty"><div class="empty-icon" aria-hidden="true">📋</div><p>שבוע אימונים מאוזן: סיבולת, כוח ומנוחה</p><button class="btn primary" onclick="createPlan()">צור תוכנית שבועית</button></div>';
+  if(!plan||!plan.sessions){
+    $('plan-content').innerHTML=`<div class="empty"><div class="empty-icon">${iconHtml('#i-plan','icon-lg')}</div><p>תכנן את שבוע האימונים שלך: סיבולת, כוח ומנוחה</p><button class="btn primary" onclick="createPlan()">צור תוכנית שבועית</button></div>`;
     return;
   }
-  if(plan.week!==key){plan={week:key,done:[]};store.set('ha_plan',plan)}
-  const s={running:'ריצה',cycling:'רכיבה',swimming:'שחייה'}[profile.sport]||'ריצה';
-  const sessions=[[s+' קלה','30 דק׳ בקצב נוח'],['כוח: פלג גוף עליון','45 דק׳ בחדר כושר'],
-    [s+' אינטרוולים','5 × 4 דק׳ מהר, 2 דק׳ מנוחה'],['מנוחה פעילה','מתיחות או הליכה, 20 דק׳'],
-    [s+' טמפו','40 דק׳ בקצב בינוני-גבוה'],['כוח: פלג גוף תחתון','45 דק׳ בחדר כושר'],[s+' ארוכה','60 דק׳ בקצב נוח']];
+  if(plan.week!==key){plan={...plan,week:key,done:[]};store.set('ha_plan',plan)}
   const today=new Date().getDay();
-  $('plan-sub').textContent=plan.done.length+' מתוך 7 הושלמו השבוע';
-  $('plan-content').innerHTML=sessions.map(([type,desc],i)=>{
+  const doneCnt=plan.done?plan.done.length:0;
+  const totalSessions=plan.sessions.filter(Boolean).length;
+  $('plan-sub').textContent=doneCnt+' מתוך '+totalSessions+' הושלמו השבוע';
+  $('plan-content').innerHTML=plan.sessions.map((session,i)=>{
     const dt=new Date(start);dt.setDate(start.getDate()+i);
-    const done=plan.done.includes(i);
-    return`<div class="plan-card${i===today?' today':''}${done?' done':''}">
+    const done=(plan.done||[]).includes(i);
+    const isRest=!session;
+    const name=isRest?'מנוחה':session.name||(session.type==='strength'?'אימון כוח':(TYPES[session.type]||TYPES.other)[1]);
+    const desc=isRest?'יום מנוחה פעילה':session.type==='strength'?(session.exercises||[]).length+' תרגילים':sessionDesc(session);
+    const isStrength=session&&session.type==='strength';
+    return`<div class="plan-card${i===today?' today':''}${done?' done':''}" ${isStrength&&!done?`onclick="startWorkout(${i})" style="cursor:pointer"`:''}>
 <div class="plan-day"><span>${i===today?'היום':DAYS[i]}</span><b>${dt.getDate()}</b></div>
-<div class="plan-info"><div class="plan-type">${type}</div><div class="plan-desc">${desc}</div></div>
-<button class="plan-check" aria-pressed="${done}" aria-label="סמן כהושלם: ${type}" onclick="togglePlan(${i})"></button></div>`;
+<div class="plan-info"><div class="plan-type">${esc(name)}</div><div class="plan-desc">${esc(desc)}</div></div>
+${!isRest?`<button class="plan-check" aria-pressed="${done}" aria-label="סמן כהושלם: ${esc(name)}" onclick="event.stopPropagation();togglePlan(${i})"></button>`:''}
+<button style="background:none;border:none;padding:8px;min-height:44px" onclick="event.stopPropagation();editPlanDay(${i})" aria-label="ערוך">${iconHtml('#i-plan')}</button>
+</div>`;
   }).join('');
 }
-function createPlan(){store.set('ha_plan',{week:ymd(weekStart()),done:[]});renderPlan()}
+
+function createPlan(){
+  const s={running:'ריצה',cycling:'רכיבה',swimming:'שחייה'}[profile.sport]||'ריצה';
+  const base=profile.sport==='cycling'?'cycling':profile.sport==='swimming'?'swimming':'running';
+  const sessions=[
+    {type:base,name:s+' קלה',duration:30,distance:null,pace:null,zone:2},
+    {type:'strength',name:'כוח: פלג גוף עליון',exercises:[
+      {name:'לחיצת חזה',sets:3,reps:10,weight:0,muscles:['חזה','כתפיים']},
+      {name:'חתירה',sets:3,reps:10,weight:0,muscles:['גב','זרועות']},
+      {name:'לחיצת כתפיים',sets:3,reps:10,weight:0,muscles:['כתפיים']},
+      {name:'כפיפות מרפק',sets:3,reps:12,weight:0,muscles:['זרועות']}
+    ]},
+    {type:base,name:s+' אינטרוולים',duration:40,distance:null,pace:null,zone:4},
+    null,
+    {type:base,name:s+' טמפו',duration:40,distance:null,pace:null,zone:3},
+    {type:'strength',name:'כוח: פלג גוף תחתון',exercises:[
+      {name:'סקוואט',sets:3,reps:10,weight:0,muscles:['רגליים','ליבה']},
+      {name:'דדליפט רומני',sets:3,reps:10,weight:0,muscles:['רגליים','גב','ליבה']},
+      {name:'לאנג׳',sets:3,reps:10,weight:0,muscles:['רגליים']},
+      {name:'עליות על ספסל',sets:3,reps:12,weight:0,muscles:['רגליים']}
+    ]},
+    {type:base,name:s+' ארוכה',duration:60,distance:null,pace:null,zone:2}
+  ];
+  store.set('ha_plan',{week:ymd(weekStart()),done:[],sessions});
+  renderPlan();
+}
+
 function togglePlan(i){
   const plan=store.get('ha_plan');
+  plan.done=plan.done||[];
   plan.done=plan.done.includes(i)?plan.done.filter(x=>x!==i):[...plan.done,i];
   store.set('ha_plan',plan);renderPlan();
+}
+
+// --- Plan editor ---
+let editingDay=-1;
+function editPlanDay(dayIdx){
+  editingDay=dayIdx;
+  const plan=store.get('ha_plan',null);
+  const session=plan?.sessions?.[dayIdx]||null;
+  const isRest=!session;
+  const content=$('plan-edit-content');
+  $('plan-edit-title').textContent='עריכת '+DAYS[dayIdx];
+
+  let html=`<div class="field"><label>סוג אימון</label>
+<select class="input" id="pe-type" onchange="updatePlanEditForm()">
+<option value="rest"${isRest?' selected':''}>מנוחה</option>
+<option value="running"${session?.type==='running'?' selected':''}>ריצה</option>
+<option value="cycling"${session?.type==='cycling'?' selected':''}>רכיבה</option>
+<option value="swimming"${session?.type==='swimming'?' selected':''}>שחייה</option>
+<option value="strength"${session?.type==='strength'?' selected':''}>כוח</option>
+</select></div>
+<div id="pe-fields"></div>`;
+  content.innerHTML=html;
+  $('plan-edit-modal').classList.add('show');
+  updatePlanEditForm(session);
+}
+function closePlanEdit(){$('plan-edit-modal').classList.remove('show')}
+
+function updatePlanEditForm(session){
+  const type=$('pe-type').value;
+  const f=$('pe-fields');
+  if(type==='rest'){f.innerHTML='<p style="text-align:center;color:var(--text2);padding:20px">יום מנוחה פעילה – מתיחות או הליכה קלה</p>';return}
+  if(type==='strength'){
+    const exs=session?.type==='strength'&&session?.exercises?session.exercises:[{name:'',sets:3,reps:10,weight:0,muscles:[]}];
+    f.innerHTML=`<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'אימון כוח')}" placeholder="אימון A"></div>
+<h3 style="margin:12px 0 8px">תרגילים</h3>
+<div id="pe-exercises">${exs.map((ex,i)=>exerciseRowHtml(i,ex)).join('')}</div>
+<button type="button" class="add-exercise-btn" onclick="addExerciseRow()">+ הוסף תרגיל</button>`;
+    return;
+  }
+  f.innerHTML=`<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'')}" placeholder="${TYPES[type]?.[1]||'אימון'}"></div>
+<div class="row">
+<div class="field"><label for="pe-dist">מרחק (ק״מ)</label><input class="input" type="number" inputmode="decimal" step="0.1" id="pe-dist" value="${session?.distance||''}"></div>
+<div class="field"><label for="pe-dur">משך (דקות)</label><input class="input" type="number" inputmode="numeric" id="pe-dur" value="${session?.duration||''}"></div>
+</div>
+<div class="row">
+<div class="field"><label for="pe-pace">קצב (דק׳/ק״מ)</label><input class="input" type="text" id="pe-pace" value="${session?.pace||''}" placeholder="5:30"></div>
+<div class="field"><label for="pe-zone">Zone</label>
+<select class="input" id="pe-zone">
+<option value="">ללא</option>
+${[1,2,3,4,5].map(z=>`<option value="${z}"${session?.zone==z?' selected':''}>Zone ${z}</option>`).join('')}
+</select></div>
+</div>`;
+}
+
+function exerciseRowHtml(idx,ex){
+  return`<div class="exercise-row" data-idx="${idx}">
+<div class="row"><div class="field" style="flex:1"><label>שם תרגיל</label><input class="input ex-name" value="${esc(ex.name||'')}" placeholder="למשל: סקוואט"></div></div>
+<div class="row3" style="margin-top:8px">
+<div class="field"><label>סטים</label><input class="input ex-sets" type="number" inputmode="numeric" min="1" max="20" value="${ex.sets||3}"></div>
+<div class="field"><label>חזרות</label><input class="input ex-reps" type="number" inputmode="numeric" min="1" max="100" value="${ex.reps||10}"></div>
+<div class="field"><label>משקל (ק״ג)</label><input class="input ex-weight" type="number" inputmode="decimal" step="0.5" min="0" value="${ex.weight||0}"></div>
+</div>
+<div class="field" style="margin-top:8px"><label>שרירים (מופרדים בפסיק)</label><input class="input ex-muscles" value="${(ex.muscles||[]).join(', ')}" placeholder="רגליים, גב, ליבה"></div>
+</div>`;
+}
+function addExerciseRow(){
+  const c=$('pe-exercises');
+  const idx=c.children.length;
+  c.insertAdjacentHTML('beforeend',exerciseRowHtml(idx,{name:'',sets:3,reps:10,weight:0,muscles:[]}));
+}
+
+function savePlanSession(){
+  const plan=store.get('ha_plan');
+  if(!plan)return;
+  const type=$('pe-type').value;
+  if(type==='rest'){plan.sessions[editingDay]=null}
+  else if(type==='strength'){
+    const rows=$('pe-exercises').querySelectorAll('.exercise-row');
+    const exercises=[...rows].map(r=>({
+      name:r.querySelector('.ex-name').value.trim(),
+      sets:parseInt(r.querySelector('.ex-sets').value)||3,
+      reps:parseInt(r.querySelector('.ex-reps').value)||10,
+      weight:parseFloat(r.querySelector('.ex-weight').value)||0,
+      muscles:r.querySelector('.ex-muscles').value.split(',').map(s=>s.trim()).filter(Boolean)
+    })).filter(e=>e.name);
+    plan.sessions[editingDay]={type:'strength',name:$('pe-name')?.value.trim()||'אימון כוח',exercises};
+  } else {
+    plan.sessions[editingDay]={
+      type,name:$('pe-name')?.value.trim()||'',
+      distance:parseFloat($('pe-dist')?.value)||null,
+      duration:parseInt($('pe-dur')?.value)||null,
+      pace:$('pe-pace')?.value.trim()||null,
+      zone:parseInt($('pe-zone')?.value)||null
+    };
+  }
+  store.set('ha_plan',plan);
+  closePlanEdit();renderPlan();
+  toast('האימון עודכן');
+}
+
+// --- Workout Mode ---
+let wo={dayIdx:-1,session:null,sets:[],currentEx:0};
+
+function startWorkout(dayIdx){
+  const plan=store.get('ha_plan');
+  const session=plan?.sessions?.[dayIdx];
+  if(!session||session.type!=='strength')return;
+  wo.dayIdx=dayIdx;
+  wo.session=JSON.parse(JSON.stringify(session));
+  wo.currentEx=0;
+  wo.sets=wo.session.exercises.map(ex=>Array.from({length:ex.sets},(_,i)=>{
+    const hist=getLastWorkoutSets(ex.name,i);
+    return{done:false,weight:hist?.weight||ex.weight||0,reps:hist?.reps||ex.reps||10};
+  }));
+  renderWorkout();
+  $('workout-mode').classList.add('show');
+  $('tab-bar').classList.remove('show');
+  $('fab').classList.remove('show');
+  document.body.style.overflow='hidden';
+}
+
+function getLastWorkoutSets(exName,setIdx){
+  const logs=store.get('ha_workout_logs',[]);
+  for(let i=logs.length-1;i>=0;i--){
+    const ex=logs[i].exercises?.find(e=>e.name===exName);
+    if(ex&&ex.sets?.[setIdx])return ex.sets[setIdx];
+  }
+  return null;
+}
+
+function renderWorkout(){
+  const s=wo.session;
+  $('wo-title').textContent=s.name;
+  const totalSets=wo.sets.reduce((a,ex)=>a+ex.length,0);
+  const doneSets=wo.sets.reduce((a,ex)=>a+ex.filter(s=>s.done).length,0);
+  $('wo-sets-label').textContent=doneSets+'/'+totalSets+' סטים';
+  $('wo-progress-fill').style.width=(totalSets?doneSets/totalSets*100:0)+'%';
+
+  $('wo-dots').innerHTML=s.exercises.map((_,i)=>{
+    const allDone=wo.sets[i].every(s=>s.done);
+    return`<div class="wo-dot${i===wo.currentEx?' active':''}${allDone?' completed':''}" onclick="goToExercise(${i})"></div>`;
+  }).join('');
+
+  $('wo-slides').style.transform=`translateX(${wo.currentEx*100}%)`;
+  $('wo-slides').innerHTML=s.exercises.map((ex,ei)=>{
+    const sets=wo.sets[ei];
+    const setsDone=sets.filter(s=>s.done).length;
+    const lastLog=getExerciseHistory(ex.name);
+    const suggestion=suggestWeight(ex.name,sets);
+    return`<div class="wo-slide"><div class="wo-card">
+<div class="wo-ex-header">
+<div class="wo-ex-sub">תרגיל ${ei+1} מתוך ${s.exercises.length}</div>
+<div class="wo-ex-name">${esc(ex.name)}</div>
+<div class="wo-muscles">${(ex.muscles||[]).map((m,mi)=>`<span class="wo-muscle${mi===0?' primary':''}">${esc(m)}</span>`).join('')}</div>
+<div class="wo-reps-chip">${ex.reps} חזרות</div>
+${lastLog?`<div class="wo-history">${esc(lastLog)}</div>`:''}
+${suggestion?`<div class="wo-suggestion">${iconHtml('#i-bolt')} ${esc(suggestion)}</div>`:''}
+</div>
+<div class="wo-set-counter">${setsDone}/${sets.length}</div>
+${sets.map((set,si)=>`<div class="wo-set${set.done?' completed':''}">
+<button class="wo-set-check${set.done?' done':''}" onclick="toggleSet(${ei},${si})">${iconHtml('#i-check')}</button>
+<div class="wo-set-label">סט ${si+1}</div>
+<div class="wo-set-fields">
+<div class="wo-stepper">
+<div class="wo-stepper-row">
+<button class="wo-stepper-btn" onclick="adjSet(${ei},${si},'weight',-2.5)">−</button>
+<div class="wo-stepper-val">${set.weight}</div>
+<button class="wo-stepper-btn" onclick="adjSet(${ei},${si},'weight',2.5)">+</button>
+</div>
+<div class="wo-stepper-label">ק״ג</div>
+</div>
+<div class="wo-stepper">
+<div class="wo-stepper-row">
+<button class="wo-stepper-btn" onclick="adjSet(${ei},${si},'reps',-1)">−</button>
+<div class="wo-stepper-val">${set.reps}</div>
+<button class="wo-stepper-btn" onclick="adjSet(${ei},${si},'reps',1)">+</button>
+</div>
+<div class="wo-stepper-label">חזרות</div>
+</div>
+</div>
+</div>`).join('')}
+<div class="wo-card-actions">
+<button onclick="skipExercise(${ei})">דלג על התרגיל</button>
+<button onclick="replaceExercise(${ei})">החלף תרגיל</button>
+</div>
+</div></div>`;
+  }).join('');
+}
+
+function goToExercise(i){wo.currentEx=i;renderWorkout()}
+function toggleSet(ei,si){wo.sets[ei][si].done=!wo.sets[ei][si].done;renderWorkout()}
+function adjSet(ei,si,field,delta){
+  const s=wo.sets[ei][si];
+  s[field]=Math.max(field==='weight'?0:1,s[field]+delta);
+  renderWorkout();
+}
+function skipExercise(ei){
+  if(ei<wo.session.exercises.length-1){wo.currentEx=ei+1;renderWorkout()}
+}
+function replaceExercise(ei){
+  const name=prompt_inline(ei);
+}
+
+function getExerciseHistory(exName){
+  const logs=store.get('ha_workout_logs',[]);
+  for(let i=logs.length-1;i>=0;i--){
+    const ex=logs[i].exercises?.find(e=>e.name===exName);
+    if(ex){
+      const d=logs[i].date?new Date(logs[i].date+'T00:00:00').toLocaleDateString('he-IL',{day:'numeric',month:'numeric'}):'';
+      return d+' • '+ex.sets.map(s=>s.reps+'×'+s.weight).join(' • ');
+    }
+  }
+  return null;
+}
+
+function suggestWeight(exName,currentSets){
+  const logs=store.get('ha_workout_logs',[]);
+  for(let i=logs.length-1;i>=0;i--){
+    const ex=logs[i].exercises?.find(e=>e.name===exName);
+    if(ex&&ex.sets.length){
+      const maxW=Math.max(...ex.sets.map(s=>s.weight));
+      if(maxW>0){
+        const next=maxW+2.5;
+        return 'מוכן ל-'+next+' ק״ג?';
+      }
+    }
+  }
+  return null;
+}
+
+function cancelWorkout(){
+  $('workout-mode').classList.remove('show');
+  document.body.style.overflow='';
+  $('tab-bar').classList.add('show');
+  $('fab').classList.add('show');
+}
+
+function finishWorkout(){
+  const log={
+    date:ymd(new Date()),
+    name:wo.session.name,
+    exercises:wo.session.exercises.map((ex,ei)=>({
+      name:ex.name,
+      sets:wo.sets[ei].filter(s=>s.done).map(s=>({weight:s.weight,reps:s.reps}))
+    })).filter(e=>e.sets.length)
+  };
+  if(log.exercises.length){
+    const logs=store.get('ha_workout_logs',[]);
+    logs.push(log);
+    store.set('ha_workout_logs',logs);
+    const totalSets=log.exercises.reduce((a,e)=>a+e.sets.length,0);
+    const dur=Math.round(totalSets*2.5);
+    const act={id:Date.now(),type:'gym',name:log.name,date:log.date,duration:dur,distance:null,hr:null,calories:null};
+    store.set('ha_activities',[...acts(),act]);
+    const plan=store.get('ha_plan');
+    if(plan){plan.done=plan.done||[];if(!plan.done.includes(wo.dayIdx))plan.done.push(wo.dayIdx);store.set('ha_plan',plan)}
+  }
+  cancelWorkout();
+  refresh();
+  toast('האימון הסתיים');
 }
 
 // --- Profile ---
@@ -507,10 +1015,12 @@ function loadSettings(){
   $('s-sport-label').textContent=(TYPES[profile.sport]||TYPES.other)[1];
   ['age','height','weight'].forEach(k=>$('s-'+k).textContent=profile[k]||'—');
   $('s-goals').textContent=(profile.goals||[]).map(g=>GOALS[g]||g).join(', ')||'לא נבחרו';
+  const hasKey=!!store.get('ha_api_key','');
+  $('s-api-status').innerHTML=hasKey?'<span class="setting-badge on">מחובר ✓</span>':'<span class="setting-badge off">לא מוגדר</span>';
 }
 function askReset(on){$('reset-confirm').hidden=!on;$('reset-btn').hidden=on}
 function resetApp(){
-  ['ha_profile','ha_activities','ha_plan'].forEach(k=>localStorage.removeItem(k));
+  ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs'].forEach(k=>localStorage.removeItem(k));
   profile=null;fillForm(null);show('welcome');
 }
 
