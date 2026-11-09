@@ -4,388 +4,276 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
 :root{
---bg:linear-gradient(160deg,#c5cfc6 0%,#a8b5a0 25%,#8a9e8a 50%,#6d8a7a 75%,#5a7a6d 100%);
---glass:rgba(255,255,255,.22);--glass2:rgba(255,255,255,.12);--glass-border:rgba(255,255,255,.35);
---text:#1a1a1a;--text2:#4a4a4a;--text3:#7a7a7a;--text-light:#fff;
---accent:#2d6a4f;--accent2:#40916c;--accent-light:rgba(45,106,79,.12);
---green:#40916c;--orange:#e07c24;--red:#d64545;--pink:#c44569;--purple:#6c5ce7;--cyan:#00b4d8;
---ring-move:#c44569;--ring-exercise:#40916c;--ring-stand:#00b4d8;
---radius:20px;--radius-sm:14px;--radius-pill:50px;
+--bg:linear-gradient(160deg,#d3ddd4,#a3b9a9);
+--card:rgba(255,255,255,.6);--bar:rgba(255,255,255,.7);--field:rgba(255,255,255,.7);--line:rgba(255,255,255,.7);
+--text:#1a1a1a;--text2:#3a403c;
+--accent:#1f5a41;--red:#a52626;
+--ring-cal:#b8355c;--ring-min:#1f5a41;--ring-km:#0b7a99;
+--radius:20px;--radius-sm:14px;--pill:50px;
 --safe-b:env(safe-area-inset-bottom,0px);
---shadow:0 4px 24px rgba(0,0,0,.08);--shadow-lg:0 8px 32px rgba(0,0,0,.12)
+--shadow:0 4px 24px rgba(0,0,0,.08)
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',sans-serif;
-background:var(--bg);background-attachment:fixed;color:var(--text);min-height:100dvh;
--webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:calc(84px + var(--safe-b))}
-::selection{background:rgba(45,106,79,.25)}
-input::placeholder{color:var(--text3)}
+/* opaque surfaces for people who turn transparency down or contrast up */
+@media (prefers-reduced-transparency:reduce),(prefers-contrast:more){:root{--card:#f3f6f3;--bar:#f3f6f3;--field:#fff;--line:#5c6b61}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
+color:var(--text);min-height:100dvh;line-height:1.4;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+padding-bottom:calc(150px + var(--safe-b))}
+/* fixed layer instead of background-attachment:fixed, which iOS Safari ignores */
+body::before{content:'';position:fixed;inset:0;background:var(--bg);z-index:-1}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input::placeholder{color:var(--text2);opacity:.7}
 
-/* === GLASS === */
-.glass{background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-border:1px solid var(--glass-border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.glass-strong{background:rgba(255,255,255,.35);backdrop-filter:blur(24px) saturate(200%);-webkit-backdrop-filter:blur(24px) saturate(200%);
-border:1px solid rgba(255,255,255,.5);border-radius:var(--radius);box-shadow:var(--shadow)}
-
-/* === SCREENS === */
 .screen{display:none;padding:16px 16px 24px;max-width:500px;margin:0 auto}
-.screen.active{display:block;animation:fadeIn .35s ease-out}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.screen.active{display:block;animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
-@keyframes spin{to{transform:rotate(360deg)}}
+h1{font-size:28px;font-weight:800;letter-spacing:-.3px}
+h2{font-size:20px;font-weight:700;margin:20px 0 10px}
+.sub{color:var(--text2);font-size:15px;margin-top:2px}
+.head{margin-bottom:20px}
 
-/* === WELCOME (first launch) === */
-#welcome-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;
-min-height:100dvh;padding:40px 24px;text-align:center}
-.welcome-icon{width:90px;height:90px;border-radius:28px;display:flex;align-items:center;justify-content:center;
-font-size:44px;margin-bottom:24px;background:rgba(255,255,255,.4);backdrop-filter:blur(16px);
-border:1px solid rgba(255,255,255,.5);box-shadow:0 8px 32px rgba(0,0,0,.1)}
-#welcome-screen h1{font-size:32px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;color:var(--text)}
-#welcome-screen .subtitle{color:var(--text2);margin-bottom:40px;font-size:17px}
+/* content layer: plain translucent surfaces, no blur */
+.card,.activity-card,.plan-card,.stat{background:var(--card);border:1px solid var(--line);
+border-radius:var(--radius);box-shadow:var(--shadow)}
+.card{padding:16px;margin-bottom:12px}
+.card-title{font-size:13px;color:var(--text2);font-weight:700;margin-bottom:12px}
 
-/* === SETUP FORM === */
-.setup-form{width:100%;max-width:380px;text-align:right}
-.setup-form .field{margin-bottom:16px}
-.setup-form label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
-.setup-form input,.setup-form select{width:100%;padding:14px 16px;border-radius:var(--radius-sm);
-border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.35);color:var(--text);font-size:16px;
-outline:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .2s}
-.setup-form input:focus,.setup-form select:focus{border-color:var(--accent)}
-.setup-form input[type="text"]{direction:rtl;text-align:right}
-.setup-form input[type="number"]{direction:ltr;text-align:left}
-.setup-form select{-webkit-appearance:none;appearance:none;
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a4a4a' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+/* === SETUP === */
+#welcome-screen.active{display:flex;flex-direction:column;align-items:center;min-height:100dvh;padding:40px 24px;text-align:center}
+.welcome-icon{width:84px;height:84px;border-radius:26px;display:flex;align-items:center;justify-content:center;
+font-size:42px;margin-bottom:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.setup-form{width:100%;max-width:380px;text-align:right;margin-top:28px}
+.field{margin-bottom:16px}
+label,.label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
+.input{width:100%;min-height:48px;padding:12px 14px;border-radius:var(--radius-sm);
+border:1px solid var(--line);background:var(--field);font-size:16px}
+.input:focus{border-color:var(--accent)}
+select.input{-webkit-appearance:none;appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233a403c' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
 background-repeat:no-repeat;background-position:left 14px center}
+.err{color:var(--red);font-size:13px;font-weight:600;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sport-btn{padding:12px 6px;min-height:76px;border-radius:var(--radius-sm);border:2px solid var(--line);
+background:var(--card);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.sport-btn span{font-size:26px}
+.goal-chips{display:flex;flex-wrap:wrap;gap:8px}
+.goal-chip{min-height:44px;padding:8px 16px;border-radius:var(--pill);border:2px solid var(--line);
+background:var(--card);font-size:15px;font-weight:500}
+.sel{border-color:var(--accent);background:#fff;font-weight:700}
+.goal-chip.sel::before{content:'✓ '}
+.note{font-size:13px;color:var(--text2);text-align:center;margin-top:12px}
 
-/* === SPORT GRID === */
-.sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
-.sport-btn{padding:14px 8px;border-radius:var(--radius-sm);border:2px solid rgba(255,255,255,.3);
-background:rgba(255,255,255,.2);backdrop-filter:blur(10px);color:var(--text);font-size:13px;
-cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:5px}
-.sport-btn .sport-emoji{font-size:26px}
-.sport-btn:active{transform:scale(.96)}
-.sport-btn.sel{border-color:var(--accent);background:rgba(45,106,79,.15);box-shadow:0 0 0 1px var(--accent)}
+.btn{width:100%;min-height:50px;padding:12px;border-radius:var(--pill);border:1px solid var(--line);
+background:var(--card);font-size:17px;font-weight:600;margin-top:10px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(31,90,65,.3)}
+.btn.danger{color:var(--red)}
+.btn:active,.fab:active,.sport-btn:active,.goal-chip:active{transform:scale(.97)}
 
-/* === GOAL CHIPS === */
-.goal-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-.goal-chip{padding:8px 16px;border-radius:var(--radius-pill);border:1.5px solid rgba(255,255,255,.35);
-background:rgba(255,255,255,.2);backdrop-filter:blur(8px);color:var(--text);font-size:14px;
-cursor:pointer;transition:.2s;font-weight:500}
-.goal-chip:active{transform:scale(.96)}
-.goal-chip.sel{border-color:var(--accent);background:rgba(45,106,79,.18);color:var(--accent)}
-
-.btn-primary{width:100%;padding:16px;border-radius:var(--radius-pill);border:none;
-background:var(--accent);color:#fff;font-size:17px;font-weight:600;cursor:pointer;
-transition:.15s;box-shadow:0 4px 16px rgba(45,106,79,.3);margin-top:8px}
-.btn-primary:active{transform:scale(.97);opacity:.9}
-.btn-secondary{width:100%;padding:14px;border-radius:var(--radius-pill);border:1px solid var(--glass-border);
-background:var(--glass);color:var(--text);font-size:16px;font-weight:600;cursor:pointer;margin-top:10px;
-backdrop-filter:blur(12px)}
-
-/* === TAB BAR === */
-.tab-bar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
-background:rgba(255,255,255,.45);backdrop-filter:blur(24px) saturate(200%);-webkit-backdrop-filter:blur(24px) saturate(200%);
-display:none;justify-content:space-around;border-radius:var(--radius-pill);
-padding:6px 8px;border:1px solid rgba(255,255,255,.5);z-index:100;
-box-shadow:0 4px 24px rgba(0,0,0,.1);width:calc(100% - 40px);max-width:420px}
+/* === functional layer: the only blurred glass === */
+.tab-bar,.modal,.toast{background:var(--bar);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+border:1px solid var(--line)}
+.tab-bar{position:fixed;bottom:calc(16px + var(--safe-b));left:50%;transform:translateX(-50%);
+display:none;border-radius:var(--pill);padding:6px;z-index:100;
+box-shadow:0 4px 24px rgba(0,0,0,.12);width:calc(100% - 32px);max-width:420px}
 .tab-bar.show{display:flex}
-.tab{display:flex;align-items:center;gap:5px;padding:10px 16px;
-color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;
-transition:.25s;border-radius:var(--radius-pill);-webkit-tap-highlight-color:transparent}
-.tab.active{color:var(--text);background:rgba(255,255,255,.5)}
-.tab svg{width:20px;height:20px;fill:currentColor}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:0 4px;
+color:var(--text2);font-size:13px;font-weight:600;border:none;background:none;border-radius:var(--pill)}
+.tab.active{color:var(--accent);background:#fff;font-weight:700}
+.tab svg{width:20px;height:20px;fill:currentColor;flex-shrink:0}
+.fab{position:fixed;bottom:calc(88px + var(--safe-b));left:20px;width:56px;height:56px;
+border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:28px;
+display:none;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(31,90,65,.4);z-index:99;line-height:1}
+.fab.show{display:flex}
+.toast{position:fixed;bottom:calc(88px + var(--safe-b));left:50%;transform:translateX(-50%);z-index:300;
+display:flex;align-items:center;gap:12px;padding-block:6px;padding-inline:16px 6px;min-height:48px;border-radius:var(--pill);
+box-shadow:0 4px 24px rgba(0,0,0,.18);font-size:15px;font-weight:600;white-space:nowrap}
+.toast button{min-height:36px;padding:0 14px;border-radius:var(--pill);border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:600}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{--bar:rgba(240,244,240,.92);border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:90dvh;overflow-y:auto;
+padding:12px 20px calc(20px + var(--safe-b));animation:slideUp .3s ease-out}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,.2);margin:0 auto 12px}
+.modal h2{margin:0 0 16px;text-align:center}
 
-/* === CARDS === */
-.card{background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;margin-bottom:12px;
-box-shadow:var(--shadow)}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.card-title{font-size:13px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
-.card-action{font-size:13px;color:var(--accent);cursor:pointer;font-weight:600}
-.section-title{font-size:20px;font-weight:700;margin:20px 0 10px}
-
-/* === GREETING === */
-.greeting{margin-bottom:20px}
-.greeting h1{font-size:28px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
-.greeting .date{color:var(--text2);font-size:14px;margin-top:2px}
-
-/* === RINGS === */
-.rings-card{padding:20px}
-.rings-container{display:flex;align-items:center;gap:20px}
-.rings-svg{width:140px;height:140px;flex-shrink:0}
-.rings-legend{display:flex;flex-direction:column;gap:14px}
+/* === TODAY === */
+.profile-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px solid #fff;flex-shrink:0}
+.profile-header h1{font-size:22px}
+.rings{display:flex;align-items:center;gap:20px;padding:20px}
+.rings svg{width:132px;height:132px;flex-shrink:0}
+.rings circle{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+.rings-legend{display:flex;flex-direction:column;gap:12px}
 .ring-item{display:flex;align-items:center;gap:10px}
 .ring-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.ring-val{font-size:22px;font-weight:700;line-height:1;color:var(--text)}
-.ring-label{font-size:12px;color:var(--text2);margin-top:1px}
-.ring-target{font-size:11px;color:var(--text3)}
+.ring-val{font-size:22px;font-weight:700;line-height:1.1}
+.ring-label{font-size:13px;color:var(--text2)}
 
-/* === METRICS === */
-.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-.metric-card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px;
-position:relative;box-shadow:var(--shadow)}
-.metric-icon{font-size:16px;margin-bottom:8px}
-.metric-val{font-size:28px;font-weight:700;line-height:1;color:var(--text)}
-.metric-label{font-size:12px;color:var(--text2);margin-top:4px}
+.activity-card,.plan-card{padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
+.act-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#fff}
+.act-info,.plan-info{flex:1;min-width:0}
+.act-name,.plan-type{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-detail,.plan-desc{font-size:14px;color:var(--text2);margin-top:2px}
+.act-metric{text-align:center;flex-shrink:0}
+.act-metric b{font-size:17px;display:block}
+.act-metric span{font-size:12px;color:var(--text2)}
+.empty{text-align:center;padding:36px 20px;color:var(--text2);font-size:15px;line-height:1.5}
+.empty-icon{font-size:44px;margin-bottom:8px}
+.empty .btn{width:auto;padding:12px 28px}
 
-/* === ACTIVITY CARDS === */
-.activity-card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px;margin-bottom:8px;
-display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
-.act-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;
-justify-content:center;font-size:20px;flex-shrink:0;background:rgba(255,255,255,.4)}
-.act-info{flex:1;min-width:0}
-.act-name{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-detail{font-size:13px;color:var(--text2);margin-top:2px}
-.act-metric{text-align:left;flex-shrink:0}
-.act-metric-val{font-size:17px;font-weight:700}
-.act-metric-unit{font-size:11px;color:var(--text2)}
-
-/* === FAB === */
-.fab{position:fixed;bottom:calc(90px + var(--safe-b));left:20px;width:52px;height:52px;
-border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;
-cursor:pointer;display:none;align-items:center;justify-content:center;
-box-shadow:0 4px 20px rgba(45,106,79,.35);z-index:99;transition:.2s;line-height:1}
-.fab.show{display:flex}
-.fab:active{transform:scale(.9)}
-
-/* === MODAL === */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);
-display:none;z-index:200;align-items:flex-end;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal{background:rgba(220,225,220,.85);backdrop-filter:blur(40px) saturate(200%);-webkit-backdrop-filter:blur(40px) saturate(200%);
-border-radius:24px 24px 0 0;width:100%;max-width:500px;
-max-height:85dvh;overflow-y:auto;padding:12px 20px calc(20px + var(--safe-b));animation:slideUp .3s ease-out;
-border-top:1px solid rgba(255,255,255,.5)}
-.modal-handle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,.15);margin:0 auto 16px}
-.modal h2{font-size:22px;font-weight:700;margin-bottom:20px;text-align:center;color:var(--text)}
-.form-group{margin-bottom:16px}
-.form-label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
-.form-input{width:100%;padding:12px 14px;border-radius:var(--radius-sm);
-border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.4);color:var(--text);font-size:16px;
-outline:none;direction:ltr;text-align:left}
-.form-input:focus{border-color:var(--accent)}
-.form-input[dir="rtl"]{direction:rtl;text-align:right}
-.form-select{width:100%;padding:12px 14px;border-radius:var(--radius-sm);
-border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.4);color:var(--text);font-size:16px;
-outline:none;-webkit-appearance:none;appearance:none;
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a4a4a' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-background-repeat:no-repeat;background-position:left 14px center}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-submit{width:100%;padding:14px;border-radius:var(--radius-pill);border:none;background:var(--accent);
-color:#fff;font-size:17px;font-weight:600;cursor:pointer;margin-top:8px;box-shadow:0 4px 16px rgba(45,106,79,.25)}
-
-/* === WEEKLY SUMMARY === */
-.week-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.week-stat{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px;text-align:center;box-shadow:var(--shadow)}
-.week-stat-val{font-size:24px;font-weight:700;color:var(--text)}
-.week-stat-label{font-size:11px;color:var(--text2);margin-top:2px}
-
-/* === CHARTS === */
-.chart-wrap{position:relative;height:180px;margin:4px 0}
+/* === WEEKLY === */
+.stat{border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat b{font-size:24px;display:block}
+.stat span{font-size:13px;color:var(--text2)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:140px}
+.bar-col{flex:1;text-align:center;font-size:12px;color:var(--text2)}
+.bar{background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px;margin:4px 0;opacity:.85}
+.bar-col.today{color:var(--text);font-weight:700}
 
 /* === PLAN === */
-.plan-card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;margin-bottom:10px;
-display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
 .plan-day{width:44px;text-align:center;flex-shrink:0}
-.plan-day-name{font-size:11px;color:var(--text2);text-transform:uppercase;font-weight:600}
-.plan-day-num{font-size:22px;font-weight:700;color:var(--text)}
-.plan-info{flex:1;min-width:0}
-.plan-type{font-size:16px;font-weight:600}
-.plan-desc{font-size:13px;color:var(--text2);margin-top:2px}
-.plan-check{width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,0,0,.15);
-display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;
-background:rgba(255,255,255,.3)}
-.plan-check.done{border-color:var(--green);background:var(--green)}
-.plan-check.done::after{content:'✓';color:#fff;font-size:14px;font-weight:700}
+.plan-day span{font-size:12px;color:var(--text2);font-weight:600;display:block}
+.plan-day b{font-size:22px}
+.plan-card.today{border:2px solid var(--accent)}
+.plan-card.today .plan-day span{color:var(--accent)}
+.plan-check{width:44px;height:44px;border:none;background:none;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.plan-check::before{content:'';width:28px;height:28px;border-radius:50%;border:2px solid var(--text2);background:#fff;
+display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700}
+.plan-check[aria-pressed=true]::before{content:'✓';background:var(--accent);border-color:var(--accent)}
+.done .plan-info{opacity:.6;text-decoration:line-through}
 
-/* === SETTINGS === */
-.settings-section{margin-bottom:20px}
-.setting-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
-border-bottom:1px solid rgba(255,255,255,.15)}
-.setting-row:last-child{border:none}
-.setting-label{font-size:16px;color:var(--text)}
-.setting-val{font-size:15px;color:var(--text2);max-width:50%;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.setting-badge{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600}
-.setting-badge.on{background:rgba(64,145,108,.18);color:var(--green)}
-.setting-badge.off{background:rgba(0,0,0,.08);color:var(--text3)}
-.btn-danger{padding:13px;border-radius:var(--radius-pill);border:none;background:rgba(214,69,69,.1);
-color:var(--red);font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:10px}
-
-/* === EMPTY === */
-.empty{text-align:center;padding:48px 20px;color:var(--text2)}
-.empty-icon{font-size:44px;margin-bottom:10px}
-.empty p{font-size:14px;line-height:1.5}
-.empty-btn{display:inline-block;margin-top:16px;padding:10px 24px;border-radius:var(--radius-pill);
-background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;border:none;
-box-shadow:0 4px 16px rgba(45,106,79,.25)}
-
-/* === PROFILE HEADER === */
-.profile-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-.profile-avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;
-justify-content:center;font-size:24px;font-weight:700;color:#fff;background:var(--accent);
-border:2px solid rgba(255,255,255,.5)}
-.profile-info h2{font-size:18px;font-weight:700}
-.profile-info p{font-size:13px;color:var(--text2)}
-
-::-webkit-scrollbar{width:0;height:0}
+/* === PROFILE === */
+.goals-row{display:flex;justify-content:space-between;gap:12px;padding-top:14px;margin-top:14px;border-top:1px solid rgba(0,0,0,.1);font-size:16px}
+.goals-row span:last-child{color:var(--text2);text-align:left}
 </style></head><body>
 
-<!-- WELCOME / SETUP -->
-<div id="welcome-screen" class="screen active">
-<div class="welcome-icon">🏋️</div>
-<h1>Hybrid Athlete</h1>
-<p class="subtitle">מעקב אימונים חכם</p>
-<div class="setup-form" id="setup-form">
+<!-- SETUP (first launch + edit) -->
+<main id="welcome-screen" class="screen">
+<div class="welcome-icon" id="welcome-icon" aria-hidden="true">🏋️</div>
+<h1 id="setup-title">Hybrid Athlete</h1>
+<p class="sub" id="setup-sub">יומן אימונים אישי</p>
+<form class="setup-form" onsubmit="event.preventDefault();saveSetup()" novalidate>
 <div class="field">
-<label>שם</label>
-<input type="text" id="s-input-name" placeholder="השם שלך">
+<label for="s-input-name">שם</label>
+<input class="input" type="text" id="s-input-name" placeholder="איך לקרוא לך?" autocomplete="given-name" aria-describedby="name-err" oninput="document.getElementById('name-err').hidden=true">
+<div class="err" id="name-err" role="alert" hidden>צריך שם כדי להתחיל</div>
 </div>
 <div class="field">
-<label>גיל</label>
-<input type="number" id="s-input-age" placeholder="25" style="direction:ltr;text-align:left">
-</div>
-<div class="field">
-<label>גובה (ס״מ)</label>
-<input type="number" id="s-input-height" placeholder="175" style="direction:ltr;text-align:left">
-</div>
-<div class="field">
-<label>משקל (ק״ג)</label>
-<input type="number" id="s-input-weight" placeholder="70" style="direction:ltr;text-align:left">
-</div>
-<div class="field">
-<label>ספורט עיקרי</label>
-<div class="sport-grid">
-<button class="sport-btn" data-sport="running" onclick="pickSport(this)"><span class="sport-emoji">🏃</span>ריצה</button>
-<button class="sport-btn" data-sport="cycling" onclick="pickSport(this)"><span class="sport-emoji">🚴</span>רכיבה</button>
-<button class="sport-btn" data-sport="swimming" onclick="pickSport(this)"><span class="sport-emoji">🏊</span>שחייה</button>
-<button class="sport-btn" data-sport="triathlon" onclick="pickSport(this)"><span class="sport-emoji">🏅</span>טריאתלון</button>
-<button class="sport-btn" data-sport="gym" onclick="pickSport(this)"><span class="sport-emoji">🏋️</span>חדר כושר</button>
-<button class="sport-btn" data-sport="other" onclick="pickSport(this)"><span class="sport-emoji">⚡</span>אחר</button>
+<span class="label" id="sport-label">ספורט עיקרי</span>
+<div class="row3" role="group" aria-labelledby="sport-label">
+<button type="button" class="sport-btn" data-sport="running" onclick="pickSport(this)"><span aria-hidden="true">🏃</span>ריצה</button>
+<button type="button" class="sport-btn" data-sport="cycling" onclick="pickSport(this)"><span aria-hidden="true">🚴</span>רכיבה</button>
+<button type="button" class="sport-btn" data-sport="swimming" onclick="pickSport(this)"><span aria-hidden="true">🏊</span>שחייה</button>
+<button type="button" class="sport-btn" data-sport="triathlon" onclick="pickSport(this)"><span aria-hidden="true">🏅</span>טריאתלון</button>
+<button type="button" class="sport-btn" data-sport="gym" onclick="pickSport(this)"><span aria-hidden="true">🏋️</span>חדר כושר</button>
+<button type="button" class="sport-btn" data-sport="other" onclick="pickSport(this)"><span aria-hidden="true">⚡</span>אחר</button>
 </div>
 </div>
 <div class="field">
-<label>יעדים</label>
-<div class="goal-chips">
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="endurance">סיבולת</button>
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="speed">מהירות</button>
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="weight">ירידה במשקל</button>
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="muscle">בניית שריר</button>
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="health">בריאות</button>
-<button class="goal-chip" onclick="toggleGoal(this)" data-goal="race">תחרות</button>
+<span class="label">פרטי גוף (לא חובה)</span>
+<div class="row3">
+<div><label for="s-input-age">גיל</label><input class="input" type="number" inputmode="numeric" min="10" max="100" id="s-input-age"></div>
+<div><label for="s-input-height">גובה (ס״מ)</label><input class="input" type="number" inputmode="numeric" min="100" max="230" id="s-input-height"></div>
+<div><label for="s-input-weight">משקל (ק״ג)</label><input class="input" type="number" inputmode="decimal" step="0.1" min="30" max="250" id="s-input-weight"></div>
 </div>
 </div>
-<button class="btn-primary" onclick="saveSetup()">בואו נתחיל 💪</button>
+<div class="field">
+<span class="label" id="goals-label">יעדים (לא חובה)</span>
+<div class="goal-chips" role="group" aria-labelledby="goals-label">
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="endurance">סיבולת</button>
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="speed">מהירות</button>
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="weight">ירידה במשקל</button>
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="muscle">בניית שריר</button>
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="health">בריאות</button>
+<button type="button" class="goal-chip" onclick="toggleGoal(this)" data-goal="race">תחרות</button>
 </div>
 </div>
+<button class="btn primary" id="setup-save">בואו נתחיל</button>
+<button type="button" class="btn" id="setup-cancel" onclick="show('settings')" hidden>ביטול</button>
+<p class="note">הפרטים נשמרים במכשיר הזה בלבד</p>
+</form>
+</main>
 
 <!-- TODAY -->
-<div id="today-screen" class="screen">
+<main id="today-screen" class="screen">
 <div class="profile-header">
-<div class="profile-avatar" id="user-avatar">א</div>
-<div class="profile-info">
-<h2 id="greeting-text">שלום 👋</h2>
-<p id="today-date"></p>
+<div class="avatar" id="user-avatar" aria-hidden="true"></div>
+<div><h1 id="greeting-text"></h1><p class="sub" id="today-date"></p></div>
 </div>
-</div>
-
-<div class="card rings-card">
-<div class="rings-container">
-<svg class="rings-svg" viewBox="0 0 140 140" id="rings-svg"></svg>
+<div class="card rings">
+<svg viewBox="0 0 140 140" id="rings-svg" role="img" aria-label="התקדמות יומית"></svg>
 <div class="rings-legend">
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-move)"></div>
-<div><div class="ring-val" id="ring-cal">--</div><div class="ring-label">קלוריות פעילות</div><div class="ring-target">מתוך 600</div></div></div>
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-exercise)"></div>
-<div><div class="ring-val" id="ring-exercise">--</div><div class="ring-label">דקות אימון</div><div class="ring-target">מתוך 30</div></div></div>
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-stand)"></div>
-<div><div class="ring-val" id="ring-steps">--</div><div class="ring-label">צעדים</div><div class="ring-target">מתוך 10,000</div></div></div>
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-cal)"></div>
+<div><div class="ring-val" id="ring-cal">0</div><div class="ring-label">קלוריות מתוך 600</div></div></div>
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-min)"></div>
+<div><div class="ring-val" id="ring-min">0</div><div class="ring-label">דקות אימון מתוך 30</div></div></div>
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-km)"></div>
+<div><div class="ring-val" id="ring-km">0</div><div class="ring-label">ק״מ מתוך 5</div></div></div>
 </div>
 </div>
-</div>
-
-<div class="section-title">הסטטיסטיקות של היום</div>
-<div class="metrics-grid">
-<div class="metric-card"><div class="metric-icon">❤️</div><div class="metric-val" id="m-hr">--</div><div class="metric-label">דופק מנוחה</div></div>
-<div class="metric-card"><div class="metric-icon">😤</div><div class="metric-val" id="m-stress">--</div><div class="metric-label">סטרס ממוצע</div></div>
-<div class="metric-card"><div class="metric-icon">🔋</div><div class="metric-val" id="m-bb">--</div><div class="metric-label">Body Battery</div></div>
-<div class="metric-card"><div class="metric-icon">😴</div><div class="metric-val" id="m-sleep">--</div><div class="metric-label">שעות שינה</div></div>
-</div>
-
-<div class="card-header"><div class="section-title" style="margin:0">אימונים אחרונים</div><div class="card-action" onclick="openAddActivity()">+ הוסף</div></div>
-<div id="activities-list"><div class="empty"><div class="empty-icon">🏃</div><p>אין אימונים עדיין<br>הוסף את האימון הראשון שלך</p>
-<button class="empty-btn" onclick="openAddActivity()">הוסף אימון</button></div></div>
-</div>
+<h2>אימונים אחרונים</h2>
+<div id="activities-list"></div>
+</main>
 
 <!-- WEEKLY -->
-<div id="weekly-screen" class="screen">
-<div class="greeting"><h1>סיכום שבועי</h1><div class="date" id="week-range"></div></div>
-<div class="week-stats">
-<div class="week-stat"><div class="week-stat-val" id="ws-count">0</div><div class="week-stat-label">אימונים</div></div>
-<div class="week-stat"><div class="week-stat-val" id="ws-dist">0</div><div class="week-stat-label">ק״מ</div></div>
-<div class="week-stat"><div class="week-stat-val" id="ws-time">0</div><div class="week-stat-label">דקות</div></div>
+<main id="weekly-screen" class="screen">
+<div class="head"><h1>סיכום שבועי</h1><p class="sub" id="week-range"></p></div>
+<div class="row3" style="margin-bottom:12px">
+<div class="stat"><b id="ws-count">0</b><span>אימונים</span></div>
+<div class="stat"><b id="ws-dist">0</b><span>ק״מ</span></div>
+<div class="stat"><b id="ws-time">0</b><span>דקות</span></div>
 </div>
-<div class="card"><div class="card-header"><div class="card-title">דופק מנוחה</div></div><div class="chart-wrap"><canvas id="chart-hr"></canvas></div></div>
-<div class="card"><div class="card-header"><div class="card-title">שינה</div></div><div class="chart-wrap"><canvas id="chart-sleep"></canvas></div></div>
-<div class="card-header"><div class="section-title" style="margin:0">אימונים השבוע</div></div>
-<div id="week-activities"><div class="empty"><p>אין אימונים השבוע</p></div></div>
-</div>
+<div class="card"><div class="card-title">דקות אימון ביום</div><div class="bars" id="week-bars"></div></div>
+<h2>אימונים השבוע</h2>
+<div id="week-activities"></div>
+</main>
 
 <!-- PLAN -->
-<div id="plan-screen" class="screen">
-<div class="greeting"><h1>תוכנית אימונים</h1><div class="date">תוכנית מותאמת אישית</div></div>
-<div id="plan-content">
-<div class="empty"><div class="empty-icon">📋</div><p>צור תוכנית אימונים מותאמת<br>לפי היעדים והספורט שלך</p>
-<button class="empty-btn" onclick="createSamplePlan()">צור תוכנית לדוגמה</button></div>
-</div>
-</div>
+<main id="plan-screen" class="screen">
+<div class="head"><h1>תוכנית אימונים</h1><p class="sub" id="plan-sub">תבנית שבועית לפי הספורט שלך</p></div>
+<div id="plan-content"></div>
+</main>
 
-<!-- SETTINGS -->
-<div id="settings-screen" class="screen">
-<div class="greeting"><h1>פרופיל</h1></div>
-<div class="settings-section">
+<!-- PROFILE -->
+<main id="settings-screen" class="screen">
+<div class="head"><h1>פרופיל</h1></div>
 <div class="card">
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-<div class="profile-avatar" id="settings-avatar" style="width:60px;height:60px;font-size:28px">א</div>
-<div><div style="font-size:18px;font-weight:700" id="s-name">—</div><div style="font-size:13px;color:var(--text2)" id="s-sport-label">—</div></div>
+<div class="avatar" id="settings-avatar" style="width:60px;height:60px;font-size:28px" aria-hidden="true"></div>
+<div><div style="font-size:20px;font-weight:700" id="s-name"></div><div class="sub" id="s-sport-label"></div></div>
 </div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-<div class="week-stat" style="margin:0"><div class="week-stat-val" id="s-age">—</div><div class="week-stat-label">גיל</div></div>
-<div class="week-stat" style="margin:0"><div class="week-stat-val" id="s-height">—</div><div class="week-stat-label">ס״מ</div></div>
-<div class="week-stat" style="margin:0"><div class="week-stat-val" id="s-weight">—</div><div class="week-stat-label">ק״ג</div></div>
+<div class="row3">
+<div class="stat"><b id="s-age"></b><span>גיל</span></div>
+<div class="stat"><b id="s-height"></b><span>ס״מ</span></div>
+<div class="stat"><b id="s-weight"></b><span>ק״ג</span></div>
 </div>
-</div></div>
-<div class="settings-section">
-<div class="card">
-<div class="card-header"><div class="card-title">הגדרות חשבון</div></div>
-<div class="setting-row"><span class="setting-label">יעדים</span><span class="setting-val" id="s-goals">—</span></div>
-<div class="setting-row"><span class="setting-label">יחידות מדידה</span><span class="setting-val">קילומטרים</span></div>
-<div class="setting-row"><span class="setting-label">שפה</span><span class="setting-val">עברית</span></div>
-</div></div>
-<div class="settings-section">
-<div class="card">
-<div class="card-header"><div class="card-title">Garmin Connect</div></div>
-<div class="setting-row"><span class="setting-label">סטטוס</span><span class="setting-val" id="s-garmin"><span class="setting-badge off">לא מחובר</span></span></div>
-<div class="setting-row"><span class="setting-label">מפתח API</span>
-<span class="setting-val"><button style="background:var(--accent);color:#fff;border:none;padding:5px 14px;border-radius:8px;cursor:pointer;font-size:14px" onclick="promptGarminKey()">עדכן</button></span></div>
-</div></div>
-<button class="btn-danger" onclick="resetApp()">איפוס נתונים</button>
-<div style="text-align:center;margin-top:20px;color:var(--text3);font-size:12px">Hybrid Athlete v1.0</div>
+<div class="goals-row"><span>יעדים</span><span id="s-goals"></span></div>
 </div>
+<button class="btn" onclick="openEdit()">עריכת פרטים</button>
+<button class="btn danger" id="reset-btn" onclick="askReset(true)">איפוס נתונים</button>
+<div class="card" id="reset-confirm" style="margin-top:12px" hidden>
+<p>כל האימונים והפרטים יימחקו מהמכשיר הזה. אי אפשר לשחזר אותם.</p>
+<div class="row"><button class="btn" onclick="askReset(false)">ביטול</button><button class="btn danger" onclick="resetApp()">מחק הכול</button></div>
+</div>
+<p class="note">Hybrid Athlete v1.1 · הנתונים נשמרים במכשיר הזה בלבד</p>
+</main>
 
-<!-- FAB -->
-<button class="fab" id="fab" onclick="openAddActivity()">+</button>
+<button class="fab" id="fab" onclick="openAddActivity()" aria-label="הוסף אימון">+</button>
 
-<!-- ADD ACTIVITY MODAL -->
+<!-- ADD ACTIVITY SHEET -->
 <div class="modal-overlay" id="add-modal" onclick="if(event.target===this)closeAddActivity()">
-<div class="modal">
+<form class="modal" role="dialog" aria-modal="true" aria-labelledby="add-title" onsubmit="event.preventDefault();saveActivity()" novalidate>
 <div class="modal-handle"></div>
-<h2>הוסף אימון</h2>
-<div class="form-group">
-<label class="form-label">סוג אימון</label>
-<select class="form-select" id="f-type">
+<h2 id="add-title">אימון חדש</h2>
+<div class="row">
+<div class="field"><label for="f-type">סוג</label>
+<select class="input" id="f-type">
 <option value="running">🏃 ריצה</option>
 <option value="cycling">🚴 רכיבה</option>
 <option value="swimming">🏊 שחייה</option>
@@ -393,312 +281,239 @@ border:2px solid rgba(255,255,255,.5)}
 <option value="walking">🚶 הליכה</option>
 <option value="hiking">🥾 טיול</option>
 <option value="other">⚡ אחר</option>
-</select>
+</select></div>
+<div class="field"><label for="f-date">תאריך</label><input class="input" type="date" id="f-date"></div>
 </div>
-<div class="form-group">
-<label class="form-label">שם האימון</label>
-<input class="form-input" dir="rtl" id="f-name" placeholder="למשל: ריצת בוקר">
+<div class="row">
+<div class="field"><label for="f-dur">משך (דקות)</label><input class="input" type="number" inputmode="numeric" min="1" id="f-dur" aria-describedby="dur-err" oninput="document.getElementById('dur-err').hidden=true">
+<div class="err" id="dur-err" role="alert" hidden>כמה דקות נמשך האימון?</div></div>
+<div class="field"><label for="f-dist">מרחק (ק״מ)</label><input class="input" type="number" inputmode="decimal" step="0.1" min="0" id="f-dist"></div>
 </div>
-<div class="form-group">
-<label class="form-label">תאריך</label>
-<input class="form-input" type="date" id="f-date">
+<div class="row">
+<div class="field"><label for="f-cal">קלוריות</label><input class="input" type="number" inputmode="numeric" min="0" id="f-cal"></div>
+<div class="field"><label for="f-hr">דופק ממוצע</label><input class="input" type="number" inputmode="numeric" min="30" max="230" id="f-hr"></div>
 </div>
-<div class="form-row">
-<div class="form-group">
-<label class="form-label">מרחק (ק״מ)</label>
-<input class="form-input" type="number" step="0.1" id="f-dist" placeholder="0.0">
-</div>
-<div class="form-group">
-<label class="form-label">משך (דקות)</label>
-<input class="form-input" type="number" id="f-dur" placeholder="0">
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label class="form-label">דופק ממוצע</label>
-<input class="form-input" type="number" id="f-hr" placeholder="---">
-</div>
-<div class="form-group">
-<label class="form-label">קלוריות</label>
-<input class="form-input" type="number" id="f-cal" placeholder="---">
-</div>
-</div>
-<div class="form-group">
-<label class="form-label">הערות</label>
-<input class="form-input" dir="rtl" id="f-notes" placeholder="איך הרגשת?">
-</div>
-<button class="form-submit" onclick="saveActivity()">שמור אימון</button>
-</div>
+<div class="field"><label for="f-name">שם האימון (לא חובה)</label><input class="input" id="f-name" placeholder="למשל: ריצת בוקר"></div>
+<div class="row"><button type="button" class="btn" onclick="closeAddActivity()">ביטול</button><button class="btn primary">שמור אימון</button></div>
+</form>
 </div>
 
-<!-- TAB BAR -->
-<nav class="tab-bar" id="tab-bar">
-<button class="tab active" onclick="showTab('today')">
-<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-היום
-</button>
-<button class="tab" onclick="showTab('weekly')">
-<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-שבועי
-</button>
-<button class="tab" onclick="showTab('plan')">
-<svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-תוכנית
-</button>
-<button class="tab" onclick="showTab('settings')">
-<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-פרופיל
-</button>
+<div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button id="toast-undo" hidden>בטל</button></div>
+
+<nav class="tab-bar" id="tab-bar" aria-label="ניווט ראשי">
+<button class="tab" data-tab="today" onclick="show('today')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>היום</button>
+<button class="tab" data-tab="weekly" onclick="show('weekly')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>שבועי</button>
+<button class="tab" data-tab="plan" onclick="show('plan')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>תוכנית</button>
+<button class="tab" data-tab="settings" onclick="show('settings')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>פרופיל</button>
 </nav>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-let profile=null,activities=[];
+const $=id=>document.getElementById(id);
+const store={
+  get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
+};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+// local calendar date; toISOString() alone is UTC and gives yesterday after midnight in Israel
+const ymd=d=>new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const TYPES={running:['🏃','ריצה'],cycling:['🚴','רכיבה'],swimming:['🏊','שחייה'],triathlon:['🏅','טריאתלון'],
+  gym:['🏋️','חדר כושר'],walking:['🚶','הליכה'],hiking:['🥾','טיול'],other:['⚡','אחר']};
+const GOALS={endurance:'סיבולת',speed:'מהירות',weight:'ירידה במשקל',muscle:'בניית שריר',health:'בריאות',race:'תחרות'};
+const DAYS=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+let profile=store.get('ha_profile',null);
+// newest first, so every list can just take the head
+const acts=()=>store.get('ha_activities',[]).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
 
-// --- Local storage helpers ---
-function saveProfile(){localStorage.setItem('ha_profile',JSON.stringify(profile))}
-function loadProfile(){try{return JSON.parse(localStorage.getItem('ha_profile'))}catch(e){return null}}
-function saveActivities(){localStorage.setItem('ha_activities',JSON.stringify(activities))}
-function loadActivities(){try{return JSON.parse(localStorage.getItem('ha_activities'))||[]}catch(e){return[]}}
+// --- Navigation ---
+function show(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===name+'-screen'));
+  $('tab-bar').classList.toggle('show',name!=='welcome');
+  $('fab').classList.toggle('show',name==='today'||name==='weekly');
+  document.querySelectorAll('.tab').forEach(t=>{
+    const on=t.dataset.tab===name;
+    t.classList.toggle('active',on);
+    on?t.setAttribute('aria-current','page'):t.removeAttribute('aria-current');
+  });
+  ({today:loadToday,weekly:loadWeekly,plan:renderPlan,settings:loadSettings})[name]?.();
+  scrollTo(0,0);
+}
 
-// --- Setup ---
+let toastTimer;
+function toast(msg,undo){
+  $('toast-msg').textContent=msg;
+  $('toast-undo').hidden=!undo;
+  $('toast-undo').onclick=()=>{undo();$('toast').hidden=true};
+  $('toast').hidden=false;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$('toast').hidden=true,5000);
+}
+
+// --- Setup / edit profile ---
 let obSport='',obGoals=[];
+function setSel(b,on){b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on)}
 function pickSport(el){
-  document.querySelectorAll('.sport-btn').forEach(b=>b.classList.remove('sel'));
-  el.classList.add('sel');obSport=el.dataset.sport;
+  obSport=el.dataset.sport;
+  document.querySelectorAll('.sport-btn').forEach(b=>setSel(b,b===el));
 }
 function toggleGoal(el){
-  el.classList.toggle('sel');
-  const g=el.dataset.goal;
-  obGoals=el.classList.contains('sel')?[...obGoals,g]:obGoals.filter(x=>x!==g);
+  const g=el.dataset.goal,on=!obGoals.includes(g);
+  obGoals=on?[...obGoals,g]:obGoals.filter(x=>x!==g);
+  setSel(el,on);
 }
-
+function fillForm(p){
+  const editing=!!p;p=p||{};
+  $('s-input-name').value=p.name||'';
+  ['age','height','weight'].forEach(k=>$('s-input-'+k).value=p[k]||'');
+  obSport=p.sport||'';obGoals=[...(p.goals||[])];
+  document.querySelectorAll('.sport-btn').forEach(b=>setSel(b,b.dataset.sport===obSport));
+  document.querySelectorAll('.goal-chip').forEach(b=>setSel(b,obGoals.includes(b.dataset.goal)));
+  $('setup-title').textContent=editing?'עריכת פרטים':'Hybrid Athlete';
+  $('setup-sub').hidden=$('welcome-icon').hidden=editing;
+  $('setup-cancel').hidden=!editing;
+  $('setup-save').textContent=editing?'שמור שינויים':'בואו נתחיל';
+  $('name-err').hidden=true;
+}
+function openEdit(){fillForm(profile);show('welcome')}
 function saveSetup(){
-  const name=document.getElementById('s-input-name').value.trim();
-  if(!name){alert('נא להזין שם');return}
-  profile={
-    name:name,
-    age:parseInt(document.getElementById('s-input-age').value)||null,
-    height:parseInt(document.getElementById('s-input-height').value)||null,
-    weight:parseInt(document.getElementById('s-input-weight').value)||null,
-    sport:obSport||'other',
-    goals:obGoals,
-    garmin_key:null
-  };
-  saveProfile();
-  enterApp();
-}
-
-// --- App ---
-function enterApp(){
-  document.getElementById('tab-bar').classList.add('show');
-  document.getElementById('fab').classList.add('show');
-  showTab('today');
-}
-
-function showTab(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(name+'-screen').classList.add('active');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const idx=['today','weekly','plan','settings'].indexOf(name);
-  if(idx>=0)document.querySelectorAll('.tab')[idx].classList.add('active');
-  if(name==='today')loadToday();
-  if(name==='weekly')loadWeekly();
-  if(name==='settings')loadSettings();
+  const name=$('s-input-name').value.trim();
+  if(!name){$('name-err').hidden=false;$('s-input-name').focus();return}
+  const num=k=>parseFloat($('s-input-'+k).value)||null;
+  const editing=!!profile;
+  profile={name,age:num('age'),height:num('height'),weight:num('weight'),sport:obSport||'other',goals:obGoals};
+  store.set('ha_profile',profile);
+  show(editing?'settings':'today');
+  if(editing)toast('הפרטים נשמרו');
 }
 
 // --- Today ---
 function loadToday(){
-  const d=new Date();
-  const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-  const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-  const hour=d.getHours();
-  const greet=hour<12?'בוקר טוב':hour<17?'צהריים טובים':hour<21?'ערב טוב':'לילה טוב';
-  const name=profile?.name||'';
-  document.getElementById('greeting-text').textContent=greet+(name?', '+name:'')+'!';
-  document.getElementById('today-date').textContent='יום '+days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()];
-  const initial=(profile?.name||'?')[0].toUpperCase();
-  document.getElementById('user-avatar').textContent=initial;
-  drawRings(0,0,0);
-  loadRecentActivities();
+  const d=new Date(),h=d.getHours();
+  const greet=h>=5&&h<12?'בוקר טוב':h>=12&&h<17?'צהריים טובים':'ערב טוב';
+  $('greeting-text').textContent=greet+', '+profile.name;
+  $('today-date').textContent=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+  $('user-avatar').textContent=profile.name[0].toUpperCase();
+  const all=acts(),today=all.filter(a=>a.date===ymd(d));
+  const sum=k=>today.reduce((s,a)=>s+(a[k]||0),0);
+  const cal=sum('calories'),min=sum('duration'),km=sum('distance');
+  $('ring-cal').textContent=Math.round(cal);
+  $('ring-min').textContent=Math.round(min);
+  $('ring-km').textContent=km.toFixed(1);
+  drawRings([[58,'cal',cal/600],[45,'min',min/30],[32,'km',km/5]]);
+  $('activities-list').innerHTML=listHtml(all.slice(0,5),
+    '<div class="empty-icon" aria-hidden="true">🏃</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>');
 }
-
-function drawRings(cal,ex,steps){
-  const svg=document.getElementById('rings-svg');
-  const cx=70,cy=70;
-  const rings=[
-    {r:58,color:'var(--ring-move)',pct:Math.min(cal/600,1.2),w:10},
-    {r:45,color:'var(--ring-exercise)',pct:Math.min(ex/30,1.2),w:10},
-    {r:32,color:'var(--ring-stand)',pct:Math.min(steps/10000,1.2),w:10}
-  ];
-  svg.innerHTML=rings.map(({r,color,pct,w})=>{
-    const circ=2*Math.PI*r;
-    return`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-opacity="0.12" stroke-width="${w}"/>
-<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round"
-stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-Math.min(pct,1))}"
-transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>`;
+function drawRings(rings){
+  $('rings-svg').innerHTML=rings.map(([r,name,pct])=>{
+    const c=2*Math.PI*r,s=`cx="70" cy="70" r="${r}" style="stroke:var(--ring-${name})"`;
+    return`<circle ${s} stroke-opacity=".15"/><circle ${s} stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(pct,1))}" transform="rotate(-90 70 70)"/>`;
   }).join('');
 }
-
-function loadRecentActivities(){
-  const acts=loadActivities().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
-  const el=document.getElementById('activities-list');
-  if(!acts.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">🏃</div><p>אין אימונים עדיין<br>הוסף את האימון הראשון שלך</p><button class="empty-btn" onclick="openAddActivity()">הוסף אימון</button></div>';return}
-  el.innerHTML=acts.map(a=>{
-    const icons={running:'🏃',cycling:'🚴',swimming:'🏊',gym:'🏋️',walking:'🚶',hiking:'🥾'};
-    const icon=icons[a.type]||'⚡';
-    return`<div class="activity-card">
-<div class="act-icon">${icon}</div>
-<div class="act-info"><div class="act-name">${a.name||a.type}</div>
+function listHtml(list,empty){
+  if(!list.length)return`<div class="empty">${empty}</div>`;
+  return list.map(a=>{
+    const [icon,label]=TYPES[a.type]||TYPES.other;
+    return`<div class="activity-card"><div class="act-icon" aria-hidden="true">${icon}</div>
+<div class="act-info"><div class="act-name">${esc(a.name||label)}</div>
 <div class="act-detail">${formatDate(a.date)}${a.duration?' · '+Math.round(a.duration)+' דק׳':''}</div></div>
-${a.distance?`<div class="act-metric"><div class="act-metric-val">${a.distance.toFixed(1)}</div><div class="act-metric-unit">ק״מ</div></div>`:''}</div>`;
+${a.distance?`<div class="act-metric"><b>${a.distance.toFixed(1)}</b><span>ק״מ</span></div>`:''}</div>`;
   }).join('');
 }
-
 function formatDate(d){
-  if(!d)return'';
-  const dt=new Date(d+'T00:00:00');
-  const today=new Date();today.setHours(0,0,0,0);
-  const diff=Math.round((today-dt)/86400000);
-  if(diff===0)return'היום';
-  if(diff===1)return'אתמול';
-  if(diff<7)return'לפני '+diff+' ימים';
-  return dt.getDate()+'/'+(dt.getMonth()+1);
+  const dt=new Date(d+'T00:00:00'),t=new Date();t.setHours(0,0,0,0);
+  const diff=Math.round((t-dt)/86400000);
+  return diff===0?'היום':diff===1?'אתמול':diff>1&&diff<7?'לפני '+diff+' ימים':dt.getDate()+'/'+(dt.getMonth()+1);
 }
 
-// --- Add Activity ---
+// --- Add activity ---
 function openAddActivity(){
-  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
-  document.getElementById('add-modal').classList.add('show');
+  $('f-date').value=$('f-date').max=ymd(new Date());
+  $('f-type').value=$('f-type').querySelector(`[value="${profile.sport}"]`)?profile.sport:'running';
+  $('dur-err').hidden=true;
+  $('add-modal').classList.add('show');
+  $('f-dur').focus();
 }
-function closeAddActivity(){document.getElementById('add-modal').classList.remove('show')}
-
+function closeAddActivity(){$('add-modal').classList.remove('show')}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAddActivity()});
 function saveActivity(){
-  const act={
-    id:Date.now(),
-    type:document.getElementById('f-type').value,
-    name:document.getElementById('f-name').value||null,
-    date:document.getElementById('f-date').value,
-    distance:parseFloat(document.getElementById('f-dist').value)||null,
-    duration:parseFloat(document.getElementById('f-dur').value)||null,
-    hr:parseInt(document.getElementById('f-hr').value)||null,
-    calories:parseInt(document.getElementById('f-cal').value)||null,
-    notes:document.getElementById('f-notes').value||null
-  };
-  activities=loadActivities();
-  activities.push(act);
-  saveActivities();
+  const num=id=>parseFloat($(id).value)||null;
+  const duration=num('f-dur');
+  if(!(duration>0)){$('dur-err').hidden=false;$('f-dur').focus();return}
+  const act={id:Date.now(),type:$('f-type').value,name:$('f-name').value.trim()||null,
+    date:$('f-date').value||ymd(new Date()),duration,distance:num('f-dist'),hr:num('f-hr'),calories:num('f-cal')};
+  store.set('ha_activities',[...acts(),act]);
   closeAddActivity();
-  ['f-name','f-dist','f-dur','f-hr','f-cal','f-notes'].forEach(id=>document.getElementById(id).value='');
-  loadRecentActivities();
+  ['f-name','f-dist','f-dur','f-hr','f-cal'].forEach(id=>$(id).value='');
+  refresh();
+  toast('האימון נשמר',()=>{store.set('ha_activities',acts().filter(a=>a.id!==act.id));refresh()});
+}
+function refresh(){loadToday();loadWeekly()}
+
+// --- Weekly (last 7 days, today last) ---
+function loadWeekly(){
+  const days=Array.from({length:7},(_,i)=>{const x=new Date();x.setDate(x.getDate()-6+i);return x});
+  const keys=days.map(ymd),week=acts().filter(a=>a.date>=keys[0]&&a.date<=keys[6]);
+  const fmt=d=>d.getDate()+'/'+(d.getMonth()+1);
+  $('week-range').textContent=fmt(days[0])+' – '+fmt(days[6]);
+  $('ws-count').textContent=week.length;
+  $('ws-dist').textContent=week.reduce((s,a)=>s+(a.distance||0),0).toFixed(1);
+  $('ws-time').textContent=Math.round(week.reduce((s,a)=>s+(a.duration||0),0));
+  const mins=keys.map(k=>Math.round(week.filter(a=>a.date===k).reduce((s,a)=>s+(a.duration||0),0)));
+  const max=Math.max(...mins,1);
+  $('week-bars').innerHTML=mins.map((m,i)=>`<div class="bar-col${i===6?' today':''}">${m||''}<div class="bar" style="height:${Math.round(m/max*90)}px"></div>${DAYS[days[i].getDay()]}</div>`).join('');
+  $('week-activities').innerHTML=listHtml(week,'<p>עוד לא נרשמו אימונים ב-7 הימים האחרונים</p>');
 }
 
-// --- Weekly ---
-let hrChart,sleepChart;
-function loadWeekly(){
-  const d=new Date();
-  const dates=Array.from({length:7},(_,i)=>{const x=new Date(d);x.setDate(d.getDate()-6+i);return x.toISOString().slice(0,10)});
-  document.getElementById('week-range').textContent=dates[0].slice(5).replace('-','/')+' — '+dates[6].slice(5).replace('-','/');
-  const acts=loadActivities().filter(a=>a.date>=dates[0]&&a.date<=dates[6]);
-  document.getElementById('ws-count').textContent=acts.length;
-  document.getElementById('ws-dist').textContent=acts.reduce((s,a)=>s+(a.distance||0),0).toFixed(1);
-  document.getElementById('ws-time').textContent=Math.round(acts.reduce((s,a)=>s+(a.duration||0),0));
-
-  const labels=dates.map(d=>{const x=new Date(d+'T00:00:00');return['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'][x.getDay()]});
-  const cfg={responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(255,255,255,.8)',titleColor:'#1a1a1a',bodyColor:'#4a4a4a',borderColor:'rgba(255,255,255,.5)',borderWidth:1,cornerRadius:10,padding:10}},
-    scales:{x:{ticks:{color:'#7a7a7a',font:{size:11}},grid:{display:false}},
-    y:{ticks:{color:'#7a7a7a',font:{size:11}},grid:{color:'rgba(0,0,0,.05)'}}}}
-;
-
-  if(typeof Chart==='undefined')return;
-  if(hrChart)hrChart.destroy();
-  hrChart=new Chart(document.getElementById('chart-hr'),{type:'line',
-    data:{labels,datasets:[{data:[null,null,null,null,null,null,null],borderColor:'#c44569',backgroundColor:'rgba(196,69,105,.08)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#c44569',borderWidth:2}]},options:cfg});
-  if(sleepChart)sleepChart.destroy();
-  sleepChart=new Chart(document.getElementById('chart-sleep'),{type:'bar',
-    data:{labels,datasets:[{data:[null,null,null,null,null,null,null],backgroundColor:'rgba(108,92,231,.4)',hoverBackgroundColor:'#6c5ce7',borderRadius:6,borderSkipped:false}]},options:cfg});
-
-  const wEl=document.getElementById('week-activities');
-  if(!acts.length){wEl.innerHTML='<div class="empty" style="padding:30px"><p>אין אימונים השבוע</p></div>';return}
-  wEl.innerHTML=acts.sort((a,b)=>b.date.localeCompare(a.date)).map(a=>{
-    const icons={running:'🏃',cycling:'🚴',swimming:'🏊',gym:'🏋️',walking:'🚶',hiking:'🥾'};
-    return`<div class="activity-card">
-<div class="act-icon">${icons[a.type]||'⚡'}</div>
-<div class="act-info"><div class="act-name">${a.name||a.type}</div>
-<div class="act-detail">${formatDate(a.date)}${a.duration?' · '+Math.round(a.duration)+' דק׳':''}</div></div>
-${a.distance?`<div class="act-metric"><div class="act-metric-val">${a.distance.toFixed(1)}</div><div class="act-metric-unit">ק״מ</div></div>`:''}</div>`;
+// --- Plan (Sunday–Saturday template; ticks saved per week) ---
+function weekStart(){const s=new Date();s.setDate(s.getDate()-s.getDay());return s}
+function renderPlan(){
+  const start=weekStart(),key=ymd(start);
+  let plan=store.get('ha_plan',null);
+  if(!plan){
+    $('plan-content').innerHTML='<div class="empty"><div class="empty-icon" aria-hidden="true">📋</div><p>שבוע אימונים מאוזן: סיבולת, כוח ומנוחה</p><button class="btn primary" onclick="createPlan()">צור תוכנית שבועית</button></div>';
+    return;
+  }
+  if(plan.week!==key){plan={week:key,done:[]};store.set('ha_plan',plan)}
+  const s={running:'ריצה',cycling:'רכיבה',swimming:'שחייה'}[profile.sport]||'ריצה';
+  const sessions=[[s+' קלה','30 דק׳ בקצב נוח'],['כוח: פלג גוף עליון','45 דק׳ בחדר כושר'],
+    [s+' אינטרוולים','5 × 4 דק׳ מהר, 2 דק׳ מנוחה'],['מנוחה פעילה','מתיחות או הליכה, 20 דק׳'],
+    [s+' טמפו','40 דק׳ בקצב בינוני-גבוה'],['כוח: פלג גוף תחתון','45 דק׳ בחדר כושר'],[s+' ארוכה','60 דק׳ בקצב נוח']];
+  const today=new Date().getDay();
+  $('plan-sub').textContent=plan.done.length+' מתוך 7 הושלמו השבוע';
+  $('plan-content').innerHTML=sessions.map(([type,desc],i)=>{
+    const dt=new Date(start);dt.setDate(start.getDate()+i);
+    const done=plan.done.includes(i);
+    return`<div class="plan-card${i===today?' today':''}${done?' done':''}">
+<div class="plan-day"><span>${i===today?'היום':DAYS[i]}</span><b>${dt.getDate()}</b></div>
+<div class="plan-info"><div class="plan-type">${type}</div><div class="plan-desc">${desc}</div></div>
+<button class="plan-check" aria-pressed="${done}" aria-label="סמן כהושלם: ${type}" onclick="togglePlan(${i})"></button></div>`;
   }).join('');
 }
-
-// --- Plan ---
-function createSamplePlan(){
-  const sportNames={running:'ריצה',cycling:'רכיבה',swimming:'שחייה',triathlon:'טריאתלון',gym:'חדר כושר',other:'אימון'};
-  const sport=profile?.sport||'running';
-  const name=sportNames[sport]||'אימון';
-  const days=['א','ב','ג','ד','ה','ו','ש'];
-  const plans=[
-    {day:0,type:name+' קלה',desc:'30 דק׳ בקצב נמוך, חימום + שחרור'},
-    {day:1,type:'חדר כושר',desc:'אימון כוח - פלג גוף עליון'},
-    {day:2,type:name+' אינטרוולים',desc:'5x800מ׳ עם 2 דק׳ מנוחה'},
-    {day:3,type:'מנוחה פעילה',desc:'מתיחות, יוגה או הליכה 20 דק׳'},
-    {day:4,type:name+' טמפו',desc:'40 דק׳ בקצב בינוני-גבוה'},
-    {day:5,type:'חדר כושר',desc:'אימון כוח - פלג גוף תחתון'},
-    {day:6,type:name+' ארוכה',desc:'60 דק׳ בקצב נוח'}
-  ];
-  const today=new Date();
-  const el=document.getElementById('plan-content');
-  el.innerHTML='<div class="card"><div class="card-header"><div class="card-title">תוכנית שבועית</div><div class="card-action">שבוע 1</div></div></div>'+
-    plans.map(p=>{
-      const dt=new Date(today);dt.setDate(today.getDate()-today.getDay()+p.day);
-      const isToday=dt.toDateString()===today.toDateString();
-      return`<div class="plan-card" style="${isToday?'border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)':''}">
-<div class="plan-day"><div class="plan-day-name">${days[p.day]}</div><div class="plan-day-num">${dt.getDate()}</div></div>
-<div class="plan-info"><div class="plan-type">${p.type}</div><div class="plan-desc">${p.desc}</div></div>
-<div class="plan-check" onclick="this.classList.toggle('done')"></div></div>`;
-    }).join('');
+function createPlan(){store.set('ha_plan',{week:ymd(weekStart()),done:[]});renderPlan()}
+function togglePlan(i){
+  const plan=store.get('ha_plan');
+  plan.done=plan.done.includes(i)?plan.done.filter(x=>x!==i):[...plan.done,i];
+  store.set('ha_plan',plan);renderPlan();
 }
 
-// --- Settings ---
+// --- Profile ---
 function loadSettings(){
-  document.getElementById('s-name').textContent=profile?.name||'—';
-  const sports={running:'ריצה',cycling:'רכיבה',swimming:'שחייה',triathlon:'טריאתלון',gym:'חדר כושר',other:'אחר'};
-  document.getElementById('s-sport-label').textContent=sports[profile?.sport]||'—';
-  document.getElementById('s-age').textContent=profile?.age||'—';
-  document.getElementById('s-height').textContent=profile?.height||'—';
-  document.getElementById('s-weight').textContent=profile?.weight||'—';
-  const initial=(profile?.name||'?')[0].toUpperCase();
-  document.getElementById('settings-avatar').textContent=initial;
-  const goalNames={endurance:'סיבולת',speed:'מהירות',weight:'משקל',muscle:'שריר',health:'בריאות',race:'תחרות'};
-  const goals=profile?.goals;
-  document.getElementById('s-goals').textContent=Array.isArray(goals)&&goals.length?goals.map(g=>goalNames[g]||g).join(', '):'—';
-  const garminEl=document.getElementById('s-garmin');
-  garminEl.innerHTML=profile?.garmin_key?'<span class="setting-badge on">מחובר ✓</span>':'<span class="setting-badge off">לא מחובר</span>';
+  askReset(false);
+  $('s-name').textContent=profile.name;
+  $('settings-avatar').textContent=profile.name[0].toUpperCase();
+  $('s-sport-label').textContent=(TYPES[profile.sport]||TYPES.other)[1];
+  ['age','height','weight'].forEach(k=>$('s-'+k).textContent=profile[k]||'—');
+  $('s-goals').textContent=(profile.goals||[]).map(g=>GOALS[g]||g).join(', ')||'לא נבחרו';
 }
-
-function promptGarminKey(){
-  const key=prompt('הכנס מפתח Garmin API:');
-  if(key){profile.garmin_key=key;saveProfile();loadSettings()}
-}
-
+function askReset(on){$('reset-confirm').hidden=!on;$('reset-btn').hidden=on}
 function resetApp(){
-  if(!confirm('למחוק את כל הנתונים?'))return;
-  localStorage.removeItem('ha_profile');localStorage.removeItem('ha_activities');
-  profile=null;activities=[];
-  document.getElementById('tab-bar').classList.remove('show');
-  document.getElementById('fab').classList.remove('show');
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('welcome-screen').classList.add('active');
+  ['ha_profile','ha_activities','ha_plan'].forEach(k=>localStorage.removeItem(k));
+  profile=null;fillForm(null);show('welcome');
 }
 
-// --- Init ---
-profile=loadProfile();
-activities=loadActivities();
-if(profile&&profile.name){
-  document.getElementById('welcome-screen').classList.remove('active');
-  enterApp();
-}
-drawRings(0,0,0);
+profile?.name?show('today'):(fillForm(null),show('welcome'));
 </script>
 </body></html>
