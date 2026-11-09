@@ -1,217 +1,782 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Garmin Training</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap">
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hybrid Athlete</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
 <style>
-:root {
-  color-scheme: dark;
-  --bg: #000000;
-  --card: #1c1c1e;
-  --card2: #2c2c2e;
-  --border: rgba(255,255,255,0.08);
-  --text: #f5f5f7;
-  --text2: rgba(235,235,245,0.6);
-  --text3: rgba(235,235,245,0.3);
-  --cyan: #00e5ff;
-  --green: #30d158;
-  --red: #ff453a;
-  --orange: #ff9f0a;
-  --purple: #bf5af2;
-  --pink: #ff375f;
-  --num: 'Rajdhani', system-ui, sans-serif;
-  --body: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
-  --r: 12px;
-}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:17px/1.5 var(--body);-webkit-font-smoothing:antialiased;
-  padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.w{max-width:960px;margin:0 auto;padding:24px 0 48px}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#000;--bg2:#0a0a0a;--card:#1c1c1e;--card2:#2c2c2e;--card3:#3a3a3c;--text:#fff;--text2:#8e8e93;--text3:#636366;
+--accent:#0a84ff;--green:#30d158;--orange:#ff9f0a;--red:#ff453a;--pink:#ff375f;--purple:#bf5af2;--cyan:#64d2ff;--yellow:#ffd60a;
+--ring-move:#ff375f;--ring-exercise:#30d158;--ring-stand:#00c7be;
+--radius:16px;--radius-sm:12px;--safe-b:env(safe-area-inset-bottom,0px)}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',sans-serif;
+background:var(--bg);color:var(--text);min-height:100dvh;-webkit-font-smoothing:antialiased;
+overflow-x:hidden;padding-bottom:calc(84px + var(--safe-b))}
+a{color:var(--accent);text-decoration:none}
+::selection{background:rgba(10,132,255,.3)}
+input::placeholder{color:var(--text3)}
 
-/* Header */
-.hdr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:28px}
-.hdr h1{font:700 34px/1.1 var(--body);color:var(--text);margin:0;flex:1;letter-spacing:-0.02em}
-.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font:500 15px var(--num);color:var(--cyan);white-space:nowrap}
-.badge .n{font-size:18px;font-weight:700}
-.date{font-size:13px;color:var(--text2);white-space:nowrap}
+/* === SCREENS === */
+.screen{display:none;padding:16px 16px 24px;max-width:500px;margin:0 auto}
+.screen.active{display:block;animation:fadeIn .35s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ringIn{from{stroke-dashoffset:var(--circ)}to{stroke-dashoffset:var(--offset)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 
-/* Grid */
-.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px}
-.c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;min-width:0}
-.c .l{font-size:13px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
-.c .v{font:700 32px/1.1 var(--num);font-variant-numeric:tabular-nums;color:var(--text)}
-.c .v .u{font-size:14px;font-weight:500;color:var(--text2);margin-right:2px}
-.c .s{font:500 13px var(--num);color:var(--text2);margin-top:4px;font-variant-numeric:tabular-nums}
-.c.hi .v{color:var(--cyan)}
+/* === AUTH === */
+#auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;
+min-height:100dvh;padding:40px 24px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(10,132,255,.08),transparent 70%)}
+.auth-logo{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,var(--pink),var(--purple));
+display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:20px;
+box-shadow:0 8px 32px rgba(191,90,242,.3)}
+#auth-screen h1{font-size:34px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;
+background:linear-gradient(135deg,#fff 60%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#auth-screen .subtitle{color:var(--text2);margin-bottom:48px;font-size:17px;font-weight:400}
+.auth-btn{width:100%;max-width:340px;padding:15px 20px;border-radius:var(--radius);border:none;
+font-size:17px;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;
+justify-content:center;gap:10px;transition:all .15s}
+.auth-btn:active{transform:scale(.97);opacity:.9}
+.auth-google{background:#fff;color:#1a1a1a}
+.auth-email-toggle{background:var(--card);color:var(--text);border:1px solid var(--card2)}
+.email-form{width:100%;max-width:340px;display:none;flex-direction:column;gap:10px;margin-top:12px}
+.email-form.show{display:flex}
+.email-form input{padding:14px 16px;border-radius:var(--radius-sm);border:1px solid var(--card2);
+background:var(--card);color:var(--text);font-size:17px;direction:ltr;text-align:left;outline:none;
+transition:border-color .2s}
+.email-form input:focus{border-color:var(--accent)}
+.email-form button{padding:14px;border-radius:var(--radius-sm);border:none;background:var(--accent);
+color:#fff;font-size:17px;font-weight:600;cursor:pointer}
+.auth-msg{color:var(--orange);font-size:14px;margin-top:12px;min-height:20px}
 
-/* Section */
-.sec{margin-bottom:32px}
-.st{font:600 22px/1.2 var(--body);color:var(--text);margin-bottom:14px;letter-spacing:-0.01em}
+/* === ONBOARDING === */
+#onboarding-screen{display:none;flex-direction:column;align-items:center;justify-content:center;
+min-height:100dvh;padding:40px 24px;text-align:center}
+.ob-progress{display:flex;gap:8px;margin-bottom:32px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--card2);transition:.3s}
+.ob-dot.active{background:var(--accent);width:24px;border-radius:4px}
+.ob-step{display:none;width:100%;max-width:380px;animation:fadeIn .3s}
+.ob-step.active{display:block}
+.ob-step h2{font-size:28px;font-weight:700;margin-bottom:6px}
+.ob-step p{color:var(--text2);margin-bottom:28px;font-size:15px}
+.sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.sport-btn{padding:16px 8px;border-radius:var(--radius);border:2px solid var(--card2);background:var(--card);
+color:var(--text);font-size:14px;cursor:pointer;transition:.2s;display:flex;flex-direction:column;
+align-items:center;gap:6px}
+.sport-btn .sport-emoji{font-size:28px}
+.sport-btn:active{transform:scale(.96)}
+.sport-btn.sel{border-color:var(--accent);background:rgba(10,132,255,.12);box-shadow:0 0 0 1px var(--accent)}
+.goal-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:right}
+.goal-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius);
+border:2px solid var(--card2);background:var(--card);cursor:pointer;transition:.2s}
+.goal-item:active{transform:scale(.98)}
+.goal-item.sel{border-color:var(--green);background:rgba(48,209,88,.08)}
+.goal-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--card2);
+display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+.goal-item.sel .goal-check{border-color:var(--green);background:var(--green)}
+.goal-item.sel .goal-check::after{content:'✓';color:#000;font-size:13px;font-weight:700}
+.ob-input{width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1px solid var(--card2);
+background:var(--card);color:var(--text);font-size:17px;margin-bottom:16px;direction:ltr;text-align:left;outline:none}
+.ob-input:focus{border-color:var(--accent)}
+.ob-btn{width:100%;padding:16px;border-radius:var(--radius);border:none;background:var(--accent);
+color:#fff;font-size:17px;font-weight:600;cursor:pointer;transition:.15s}
+.ob-btn:active{transform:scale(.97)}
+.ob-btn:disabled{opacity:.4;cursor:default}
+.ob-skip{background:transparent;color:var(--text2);margin-top:12px;border:none;font-size:15px;cursor:pointer}
 
-/* Chart */
-.ch{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;min-width:0;overflow-x:auto}
-.ci{min-width:500px;position:relative}
-.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:12px}
-@media(max-width:500px){.cg{grid-template-columns:1fr}.ci{min-width:340px}}
+/* === TAB BAR === */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,18,18,.88);
+backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+display:none;justify-content:space-around;
+padding:6px 0 calc(6px + var(--safe-b));border-top:1px solid rgba(255,255,255,.06);z-index:100}
+.tab-bar.show{display:flex}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;
+color:var(--text3);font-size:10px;font-weight:500;cursor:pointer;border:none;background:none;
+transition:.2s;min-width:56px;-webkit-tap-highlight-color:transparent}
+.tab.active{color:var(--accent)}
+.tab svg{width:22px;height:22px;fill:currentColor}
 
-/* Donut */
-.br{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:center}
-@media(max-width:600px){.br{grid-template-columns:1fr}}
-.ll{list-style:none;padding:0;margin:0}
-.ll li{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:15px;min-height:44px}
-.ld{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.lv{margin-right:auto;font:700 14px var(--num);font-variant-numeric:tabular-nums;color:var(--text2)}
+/* === CARDS === */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-size:13px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.card-action{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500}
+.section-title{font-size:20px;font-weight:700;margin:20px 0 10px}
 
-/* Records */
-.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.rc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
-.rc .rv{font:700 24px var(--num);color:var(--cyan);font-variant-numeric:tabular-nums}
-.rc .rl{font-size:12px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em}
-.rc .rs{font-size:12px;color:var(--text3);margin-top:2px}
+/* === GREETING === */
+.greeting{margin-bottom:20px}
+.greeting h1{font-size:30px;font-weight:800;letter-spacing:-.3px}
+.greeting .date{color:var(--text2);font-size:15px;margin-top:2px}
 
-/* Table */
-.at{width:100%;border-collapse:collapse;font-size:15px}
-.at th{text-align:right;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;padding:10px;border-bottom:1px solid var(--border);white-space:nowrap}
-.at td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.03);font:500 15px var(--num);font-variant-numeric:tabular-nums;white-space:nowrap}
-.at td:first-child{font-family:var(--body)}
-.at tr:hover td{background:rgba(255,255,255,0.03)}
-.an{color:var(--text2);font-family:var(--body)!important;font-size:14px}
+/* === RINGS === */
+.rings-card{padding:20px}
+.rings-container{display:flex;align-items:center;gap:20px}
+.rings-svg{width:150px;height:150px;flex-shrink:0}
+.rings-legend{display:flex;flex-direction:column;gap:14px}
+.ring-item{display:flex;align-items:center;gap:10px}
+.ring-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ring-val{font-size:22px;font-weight:700;line-height:1}
+.ring-label{font-size:12px;color:var(--text2);margin-top:1px}
+.ring-target{font-size:11px;color:var(--text3)}
 
-:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* === METRICS === */
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.metric-card{background:var(--card);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 0 3px 0}
+.metric-card.hr::before{background:var(--pink)}
+.metric-card.stress::before{background:var(--orange)}
+.metric-card.bb::before{background:var(--cyan)}
+.metric-card.sleep::before{background:var(--purple)}
+.metric-icon{font-size:16px;margin-bottom:8px}
+.metric-val{font-size:28px;font-weight:700;line-height:1}
+.metric-label{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* === ACTIVITY CARDS === */
+.activity-card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:8px;
+display:flex;align-items:center;gap:14px;transition:.15s;cursor:default}
+.act-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;
+justify-content:center;font-size:20px;flex-shrink:0}
+.act-info{flex:1;min-width:0}
+.act-name{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-detail{font-size:13px;color:var(--text2);margin-top:2px}
+.act-metric{text-align:left;flex-shrink:0}
+.act-metric-val{font-size:17px;font-weight:700}
+.act-metric-unit{font-size:11px;color:var(--text2)}
+
+/* === FAB === */
+.fab{position:fixed;bottom:calc(90px + var(--safe-b));left:16px;width:52px;height:52px;
+border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:28px;
+cursor:pointer;display:none;align-items:center;justify-content:center;
+box-shadow:0 4px 16px rgba(10,132,255,.4);z-index:99;transition:.2s;line-height:1}
+.fab.show{display:flex}
+.fab:active{transform:scale(.92)}
+
+/* === MODAL === */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+display:none;z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:500px;
+max-height:85dvh;overflow-y:auto;padding:12px 20px calc(20px + var(--safe-b));animation:slideUp .3s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--card2);margin:0 auto 16px}
+.modal h2{font-size:22px;font-weight:700;margin-bottom:20px;text-align:center}
+.form-group{margin-bottom:16px}
+.form-label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500}
+.form-input{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--card2);
+background:var(--card);color:var(--text);font-size:16px;outline:none;direction:ltr;text-align:left}
+.form-input:focus{border-color:var(--accent)}
+.form-input[dir="rtl"]{direction:rtl;text-align:right}
+.form-select{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--card2);
+background:var(--card);color:var(--text);font-size:16px;outline:none;-webkit-appearance:none;appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238e8e93' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+background-repeat:no-repeat;background-position:left 14px center}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-submit{width:100%;padding:14px;border-radius:var(--radius);border:none;background:var(--accent);
+color:#fff;font-size:17px;font-weight:600;cursor:pointer;margin-top:8px}
+.form-submit:active{transform:scale(.98)}
+
+/* === WEEKLY SUMMARY === */
+.week-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.week-stat{background:var(--card);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.week-stat-val{font-size:24px;font-weight:700}
+.week-stat-label{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* === CHARTS === */
+.chart-wrap{position:relative;height:180px;margin:4px 0}
+
+/* === PLAN === */
+.plan-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:10px;
+display:flex;align-items:center;gap:14px}
+.plan-day{width:44px;text-align:center;flex-shrink:0}
+.plan-day-name{font-size:11px;color:var(--text2);text-transform:uppercase;font-weight:600}
+.plan-day-num{font-size:22px;font-weight:700}
+.plan-info{flex:1;min-width:0}
+.plan-type{font-size:16px;font-weight:600}
+.plan-desc{font-size:13px;color:var(--text2);margin-top:2px}
+.plan-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--card2);
+display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s}
+.plan-check.done{border-color:var(--green);background:var(--green)}
+.plan-check.done::after{content:'✓';color:#000;font-size:14px;font-weight:700}
+
+/* === SETTINGS === */
+.settings-section{margin-bottom:20px}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
+border-bottom:1px solid rgba(255,255,255,.05)}
+.setting-row:last-child{border:none}
+.setting-label{font-size:16px}
+.setting-val{font-size:15px;color:var(--text2);max-width:50%;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setting-badge{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600}
+.setting-badge.on{background:rgba(48,209,88,.15);color:var(--green)}
+.setting-badge.off{background:rgba(142,142,147,.15);color:var(--text2)}
+.btn-secondary{padding:13px;border-radius:var(--radius);border:1px solid var(--card2);
+background:var(--card);color:var(--text);font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:10px}
+.btn-danger{padding:13px;border-radius:var(--radius);border:none;background:rgba(255,69,58,.12);
+color:var(--red);font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:10px}
+.btn-primary{padding:13px;border-radius:var(--radius);border:none;background:var(--accent);
+color:#fff;font-size:16px;font-weight:600;width:100%;cursor:pointer;margin-top:10px}
+
+/* === LOADING & EMPTY === */
+.loading{display:flex;align-items:center;justify-content:center;min-height:120px;color:var(--text2)}
+.spinner{width:20px;height:20px;border:2.5px solid var(--card2);border-top-color:var(--accent);
+border-radius:50%;animation:spin .7s linear infinite;margin-left:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.empty p{font-size:14px;line-height:1.5}
+.empty-btn{display:inline-block;margin-top:16px;padding:10px 24px;border-radius:var(--radius);
+background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;border:none}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar{width:0;height:0}
 </style></head><body>
-<div class="w">
-  <div class="hdr">
-    <h1>Garmin Training</h1>
-    <div class="badge">גיל כושר <span class="n">18</span> <span style="color:var(--text2)">/ 20</span></div>
-    <div class="date">עדכון אחרון: 9 בנוב׳ 2026</div>
-  </div>
-  <div class="g" id="hero"></div>
-  <div class="sec"><div class="st">השבוע מול הממוצע</div><div class="g" id="weekCompare"></div></div>
-  <div class="sec"><div class="st">פילוח פעילויות</div>
-    <div class="ch"><div class="br"><div style="max-width:220px;margin:0 auto"><canvas id="donut"></canvas></div><ul class="ll" id="legend"></ul></div></div>
-  </div>
-  <div class="sec"><div class="st">עומס אימון ואפקט אירובי</div><div class="ch"><div class="ci"><canvas id="loadChart"></canvas></div></div></div>
-  <div class="sec"><div class="st">מגמות בריאות</div>
-    <div class="cg">
-      <div class="ch"><div class="ci"><canvas id="hrChart"></canvas></div></div>
-      <div class="ch"><div class="ci"><canvas id="hrvChart"></canvas></div></div>
-      <div class="ch"><div class="ci"><canvas id="sleepScoreChart"></canvas></div></div>
-      <div class="ch"><div class="ci"><canvas id="bbChart"></canvas></div></div>
-    </div>
-  </div>
-  <div class="sec"><div class="st">הרכב שינה — 30 לילות אחרונים</div><div class="ch"><div class="ci"><canvas id="sleepStack"></canvas></div></div></div>
-  <div class="sec"><div class="st">שיאים</div><div class="rg" id="records"></div></div>
-  <div class="sec"><div class="st">פעילויות אחרונות</div>
-    <div class="ch" style="padding:0;overflow-x:auto">
-      <table class="at" id="actTable"><thead><tr><th>תאריך</th><th>סוג</th><th>שם</th><th>מרחק</th><th>זמן</th><th>דופק ⌀</th><th>עומס</th></tr></thead><tbody></tbody></table>
-    </div>
-  </div>
+
+<!-- AUTH -->
+<div id="auth-screen" class="screen active">
+<div class="auth-logo">🏋️</div>
+<h1>Hybrid Athlete</h1>
+<p class="subtitle">מעקב אימונים חכם</p>
+<button class="auth-btn auth-google" onclick="signInGoogle()">
+<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.9 23.9 0 000 24c0 3.77.9 7.35 2.56 10.56l7.97-5.97z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+המשך עם Google
+</button>
+<button class="auth-btn auth-email-toggle" onclick="toggleEmail()">המשך עם אימייל</button>
+<div class="email-form" id="email-form">
+<input type="email" id="email-input" placeholder="אימייל" autocomplete="email">
+<input type="password" id="pass-input" placeholder="סיסמה (6+ תווים)" autocomplete="current-password">
+<button onclick="signInEmail()">כניסה / הרשמה</button>
 </div>
+<div class="auth-msg" id="auth-msg"></div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding-screen" class="screen">
+<div class="ob-progress"><div class="ob-dot active" id="od1"></div><div class="ob-dot" id="od2"></div><div class="ob-dot" id="od3"></div></div>
+<div class="ob-step active" id="ob-step-1">
+<h2>מה הספורט העיקרי שלך?</h2>
+<p>נתאים את חוויית המעקב בשבילך</p>
+<div class="sport-grid">
+<button class="sport-btn" data-sport="running" onclick="pickSport(this)"><span class="sport-emoji">🏃</span>ריצה</button>
+<button class="sport-btn" data-sport="cycling" onclick="pickSport(this)"><span class="sport-emoji">🚴</span>רכיבה</button>
+<button class="sport-btn" data-sport="swimming" onclick="pickSport(this)"><span class="sport-emoji">🏊</span>שחייה</button>
+<button class="sport-btn" data-sport="triathlon" onclick="pickSport(this)"><span class="sport-emoji">🏅</span>טריאתלון</button>
+<button class="sport-btn" data-sport="gym" onclick="pickSport(this)"><span class="sport-emoji">🏋️</span>חדר כושר</button>
+<button class="sport-btn" data-sport="other" onclick="pickSport(this)"><span class="sport-emoji">⚡</span>אחר</button>
+</div>
+<button class="ob-btn" onclick="nextOb(2)">המשך</button>
+</div>
+<div class="ob-step" id="ob-step-2">
+<h2>מה היעדים שלך?</h2>
+<p>ניתן לבחור כמה שרוצים</p>
+<div class="goal-list">
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="endurance"><div class="goal-check"></div><span>שיפור סיבולת</span></div>
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="speed"><div class="goal-check"></div><span>שיפור מהירות</span></div>
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="weight"><div class="goal-check"></div><span>ירידה במשקל</span></div>
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="muscle"><div class="goal-check"></div><span>בניית שריר</span></div>
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="health"><div class="goal-check"></div><span>בריאות כללית</span></div>
+<div class="goal-item" onclick="toggleGoal(this)" data-goal="race"><div class="goal-check"></div><span>הכנה לתחרות</span></div>
+</div>
+<button class="ob-btn" onclick="nextOb(3)">המשך</button>
+</div>
+<div class="ob-step" id="ob-step-3">
+<h2>חיבור Garmin</h2>
+<p>הכנס את מפתח ה-API האישי שלך מ-Garmin Connect</p>
+<input class="ob-input" type="password" id="garmin-key-input" placeholder="Garmin Personal API Key">
+<button class="ob-btn" onclick="saveOnboarding()">התחל להתאמן 💪</button>
+<button class="ob-skip" onclick="saveOnboarding()">דלג, אגדיר אחר כך</button>
+</div>
+</div>
+
+<!-- TODAY -->
+<div id="today-screen" class="screen">
+<div class="greeting">
+<h1 id="greeting-text">שלום 👋</h1>
+<div class="date" id="today-date"></div>
+</div>
+
+<div class="card rings-card">
+<div class="rings-container">
+<svg class="rings-svg" viewBox="0 0 150 150" id="rings-svg"></svg>
+<div class="rings-legend">
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-move)"></div>
+<div><div class="ring-val" id="ring-cal">--</div><div class="ring-label">קלוריות פעילות</div><div class="ring-target">מתוך 600</div></div></div>
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-exercise)"></div>
+<div><div class="ring-val" id="ring-exercise">--</div><div class="ring-label">דקות אימון</div><div class="ring-target">מתוך 30</div></div></div>
+<div class="ring-item"><div class="ring-dot" style="background:var(--ring-stand)"></div>
+<div><div class="ring-val" id="ring-steps">--</div><div class="ring-label">צעדים</div><div class="ring-target">מתוך 10,000</div></div></div>
+</div>
+</div>
+</div>
+
+<div class="metrics-grid">
+<div class="metric-card hr"><div class="metric-icon">❤️</div><div class="metric-val" id="m-hr">--</div><div class="metric-label">דופק מנוחה</div></div>
+<div class="metric-card stress"><div class="metric-icon">😤</div><div class="metric-val" id="m-stress">--</div><div class="metric-label">סטרס ממוצע</div></div>
+<div class="metric-card bb"><div class="metric-icon">🔋</div><div class="metric-val" id="m-bb">--</div><div class="metric-label">Body Battery</div></div>
+<div class="metric-card sleep"><div class="metric-icon">😴</div><div class="metric-val" id="m-sleep">--</div><div class="metric-label">שעות שינה</div></div>
+</div>
+
+<div class="card-header"><div class="section-title" style="margin:0">אימונים אחרונים</div><div class="card-action" onclick="openAddActivity()">+ הוסף</div></div>
+<div id="activities-list"><div class="empty"><div class="empty-icon">🏃</div><p>אין אימונים עדיין<br>חבר את Garmin או הוסף ידנית</p>
+<button class="empty-btn" onclick="openAddActivity()">הוסף אימון ראשון</button></div></div>
+</div>
+
+<!-- WEEKLY -->
+<div id="weekly-screen" class="screen">
+<div class="greeting"><h1>סיכום שבועי</h1><div class="date" id="week-range"></div></div>
+<div class="week-stats">
+<div class="week-stat"><div class="week-stat-val" id="ws-count">0</div><div class="week-stat-label">אימונים</div></div>
+<div class="week-stat"><div class="week-stat-val" id="ws-dist">0</div><div class="week-stat-label">ק״מ</div></div>
+<div class="week-stat"><div class="week-stat-val" id="ws-time">0</div><div class="week-stat-label">דקות</div></div>
+</div>
+<div class="card"><div class="card-header"><div class="card-title">דופק מנוחה</div></div><div class="chart-wrap"><canvas id="chart-hr"></canvas></div></div>
+<div class="card"><div class="card-header"><div class="card-title">שינה</div></div><div class="chart-wrap"><canvas id="chart-sleep"></canvas></div></div>
+<div class="card-header"><div class="section-title" style="margin:0">אימונים השבוע</div></div>
+<div id="week-activities"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<!-- PLAN -->
+<div id="plan-screen" class="screen">
+<div class="greeting"><h1>תוכנית אימונים</h1><div class="date">תוכנית מותאמת אישית</div></div>
+<div id="plan-content">
+<div class="empty"><div class="empty-icon">📋</div><p>צור תוכנית אימונים מותאמת<br>לפי היעדים והספורט שלך</p>
+<button class="empty-btn" onclick="createSamplePlan()">צור תוכנית לדוגמה</button></div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-screen" class="screen">
+<div class="greeting"><h1>הגדרות</h1></div>
+<div class="settings-section">
+<div class="card">
+<div class="card-header"><div class="card-title">פרופיל</div></div>
+<div class="setting-row"><span class="setting-label">שם תצוגה</span><span class="setting-val" id="s-name">—</span></div>
+<div class="setting-row"><span class="setting-label">ספורט עיקרי</span><span class="setting-val" id="s-sport">—</span></div>
+<div class="setting-row"><span class="setting-label">אימייל</span><span class="setting-val" id="s-email">—</span></div>
+<div class="setting-row"><span class="setting-label">יעדים</span><span class="setting-val" id="s-goals">—</span></div>
+</div></div>
+<div class="settings-section">
+<div class="card">
+<div class="card-header"><div class="card-title">Garmin Connect</div></div>
+<div class="setting-row"><span class="setting-label">סטטוס</span><span class="setting-val" id="s-garmin"><span class="setting-badge off">לא מחובר</span></span></div>
+<div class="setting-row"><span class="setting-label">מפתח API</span>
+<span class="setting-val"><button style="background:var(--accent);color:#fff;border:none;padding:5px 14px;border-radius:8px;cursor:pointer;font-size:14px" onclick="promptGarminKey()">עדכן</button></span></div>
+</div></div>
+<div class="settings-section">
+<div class="card">
+<div class="card-header"><div class="card-title">העדפות</div></div>
+<div class="setting-row"><span class="setting-label">יחידות מדידה</span><span class="setting-val">קילומטרים</span></div>
+<div class="setting-row"><span class="setting-label">שפה</span><span class="setting-val">עברית</span></div>
+<div class="setting-row"><span class="setting-label">ערכת נושא</span><span class="setting-val">כהה</span></div>
+</div></div>
+<button class="btn-danger" onclick="signOut()">התנתק</button>
+<div style="text-align:center;margin-top:20px;color:var(--text3);font-size:12px">Hybrid Athlete v1.0</div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openAddActivity()">+</button>
+
+<!-- ADD ACTIVITY MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)closeAddActivity()">
+<div class="modal">
+<div class="modal-handle"></div>
+<h2>הוסף אימון</h2>
+<div class="form-group">
+<label class="form-label">סוג אימון</label>
+<select class="form-select" id="f-type">
+<option value="running">🏃 ריצה</option>
+<option value="cycling">🚴 רכיבה</option>
+<option value="swimming">🏊 שחייה</option>
+<option value="gym">🏋️ חדר כושר</option>
+<option value="walking">🚶 הליכה</option>
+<option value="hiking">🥾 טיול</option>
+<option value="other">⚡ אחר</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">שם האימון</label>
+<input class="form-input" dir="rtl" id="f-name" placeholder="למשל: ריצת בוקר">
+</div>
+<div class="form-group">
+<label class="form-label">תאריך</label>
+<input class="form-input" type="date" id="f-date">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">מרחק (ק״מ)</label>
+<input class="form-input" type="number" step="0.1" id="f-dist" placeholder="0.0">
+</div>
+<div class="form-group">
+<label class="form-label">משך (דקות)</label>
+<input class="form-input" type="number" id="f-dur" placeholder="0">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label class="form-label">דופק ממוצע</label>
+<input class="form-input" type="number" id="f-hr" placeholder="---">
+</div>
+<div class="form-group">
+<label class="form-label">קלוריות</label>
+<input class="form-input" type="number" id="f-cal" placeholder="---">
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">הערות</label>
+<input class="form-input" dir="rtl" id="f-notes" placeholder="איך הרגשת?">
+</div>
+<button class="form-submit" onclick="saveActivity()">שמור אימון</button>
+</div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tab-bar" id="tab-bar">
+<button class="tab active" onclick="showTab('today')">
+<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+היום
+</button>
+<button class="tab" onclick="showTab('weekly')">
+<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+שבועי
+</button>
+<button class="tab" onclick="showTab('plan')">
+<svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+תוכנית
+</button>
+<button class="tab" onclick="showTab('settings')">
+<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+הגדרות
+</button>
+</nav>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-const D = {"acts":[{"d":"2026-07-06","t":"running","n":"כש״ג","dist":3.01,"dur":15.4,"cal":269,"avgHR":193,"maxHR":208,"elev":13,"load":155.1,"aero":3.8},{"d":"2026-07-17","t":"running","n":"ריצה","dist":2.49,"dur":15,"cal":207,"avgHR":169,"maxHR":192,"elev":17,"load":52,"aero":2.8},{"d":"2026-08-04","t":"pilates","n":"פילאטיס","dist":0,"dur":46,"cal":285,"avgHR":115,"maxHR":147,"elev":0,"load":13.1,"aero":1.2},{"d":"2026-08-09","t":"multi_sport","n":"ספורט משולב","dist":1.55,"dur":12.2,"cal":123,"avgHR":0,"maxHR":182,"elev":6,"load":23.1,"aero":2},{"d":"2026-08-13","t":"walking","n":"הליכה","dist":5.01,"dur":59,"cal":311,"avgHR":111,"maxHR":125,"elev":11,"load":11,"aero":1.1},{"d":"2026-08-20","t":"running","n":"ריצה","dist":2.4,"dur":15.4,"cal":221,"avgHR":184,"maxHR":197,"elev":13,"load":82.1,"aero":3.2},{"d":"2026-08-26","t":"running","n":"ריצה","dist":5.04,"dur":47.3,"cal":432,"avgHR":149,"maxHR":178,"elev":24,"load":34.6,"aero":2.3},{"d":"2026-08-28","t":"running","n":"ריצה","dist":1.31,"dur":12.3,"cal":103,"avgHR":136,"maxHR":161,"elev":6,"load":8.8,"aero":0.8},{"d":"2026-08-31","t":"indoor_cycling","n":"אופני כושר","dist":0,"dur":10.8,"cal":126,"avgHR":144,"maxHR":163,"elev":0,"load":27.2,"aero":2},{"d":"2026-09-04","t":"walking","n":"הליכה","dist":4.71,"dur":66.8,"cal":298,"avgHR":104,"maxHR":123,"elev":5,"load":7.4,"aero":0.7},{"d":"2026-09-09","t":"indoor_cycling","n":"אופני כושר","dist":0,"dur":19.1,"cal":192,"avgHR":135,"maxHR":152,"elev":0,"load":22.9,"aero":2},{"d":"2026-09-15","t":"indoor_cycling","n":"אופני כושר","dist":0,"dur":20,"cal":209,"avgHR":137,"maxHR":171,"elev":0,"load":41.7,"aero":2.3},{"d":"2026-09-17","t":"indoor_cycling","n":"Indoor Cycling","dist":0,"dur":4.4,"cal":35,"avgHR":118,"maxHR":142,"elev":0,"load":4.7,"aero":0.4},{"d":"2026-09-29","t":"multi_sport","n":"ספורט משולב","dist":7.66,"dur":75.5,"cal":537,"avgHR":0,"maxHR":193,"elev":23,"load":62.7,"aero":3},{"d":"2026-10-05","t":"walking","n":"הליכה","dist":4.21,"dur":55.9,"cal":263,"avgHR":100,"maxHR":127,"elev":2,"load":8.5,"aero":0.8},{"d":"2026-10-05","t":"walking","n":"הליכה","dist":5.04,"dur":69.4,"cal":313,"avgHR":101,"maxHR":121,"elev":10,"load":9.3,"aero":0.9},{"d":"2026-10-08","t":"treadmill_running","n":"ריצה בהליכון","dist":2.02,"dur":15.8,"cal":198,"avgHR":157,"maxHR":193,"elev":0,"load":70.1,"aero":2.8},{"d":"2026-10-19","t":"indoor_cycling","n":"אופני כושר","dist":0,"dur":15.1,"cal":161,"avgHR":137,"maxHR":159,"elev":0,"load":32.7,"aero":2.2},{"d":"2026-10-26","t":"indoor_cycling","n":"אופני כושר","dist":0,"dur":14.8,"cal":177,"avgHR":147,"maxHR":159,"elev":0,"load":34.1,"aero":2.3},{"d":"2026-11-05","t":"multi_sport","n":"ספורט משולב","dist":2.68,"dur":22.7,"cal":252,"avgHR":0,"maxHR":204,"elev":13,"load":82.7,"aero":3},{"d":"2026-11-09","t":"treadmill_running","n":"ריצה בהליכון","dist":0.94,"dur":6.3,"cal":85,"avgHR":162,"maxHR":191,"elev":0,"load":44.4,"aero":2.1}],
-"days":[{"d":"2026-07-04","steps":5375,"restHR":64,"stressAvg":50,"bbMax":10,"bbMin":5,"intMod":47,"intVig":25},{"d":"2026-07-05","steps":9690,"restHR":51,"stressAvg":34,"bbMax":74,"bbMin":5,"intMod":6,"intVig":23},{"d":"2026-07-06","steps":14573,"restHR":51,"stressAvg":41,"bbMax":74,"bbMin":5,"intMod":19,"intVig":37},{"d":"2026-07-07","steps":11652,"restHR":53,"stressAvg":42,"bbMax":85,"bbMin":8,"intMod":0,"intVig":0},{"d":"2026-07-08","steps":9648,"restHR":52,"stressAvg":34,"bbMax":80,"bbMin":16,"intMod":0,"intVig":1},{"d":"2026-07-09","steps":8544,"restHR":48,"stressAvg":45,"bbMax":99,"bbMin":5,"intMod":1,"intVig":3},{"d":"2026-07-10","steps":7726,"restHR":55,"stressAvg":38,"bbMax":57,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-07-11","steps":3621,"restHR":54,"stressAvg":40,"bbMax":80,"bbMin":6,"intMod":1,"intVig":1},{"d":"2026-07-12","steps":3363,"restHR":50,"stressAvg":30,"bbMax":82,"bbMin":6,"intMod":0,"intVig":0},{"d":"2026-07-13","steps":13464,"restHR":49,"stressAvg":36,"bbMax":89,"bbMin":5,"intMod":2,"intVig":2},{"d":"2026-07-14","steps":4519,"restHR":50,"stressAvg":32,"bbMax":86,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-07-15","steps":10665,"restHR":51,"stressAvg":38,"bbMax":84,"bbMin":11,"intMod":6,"intVig":21},{"d":"2026-07-16","steps":7440,"restHR":49,"stressAvg":35,"bbMax":80,"bbMin":10,"intMod":0,"intVig":0},{"d":"2026-07-17","steps":11468,"restHR":52,"stressAvg":38,"bbMax":69,"bbMin":7,"intMod":4,"intVig":23},{"d":"2026-07-18","steps":3170,"restHR":50,"stressAvg":32,"bbMax":82,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-07-19","steps":9108,"restHR":51,"stressAvg":35,"bbMax":74,"bbMin":7,"intMod":2,"intVig":11},{"d":"2026-07-20","steps":8974,"restHR":52,"stressAvg":34,"bbMax":78,"bbMin":5,"intMod":5,"intVig":21},{"d":"2026-07-21","steps":13217,"restHR":48,"stressAvg":37,"bbMax":100,"bbMin":10,"intMod":1,"intVig":5},{"d":"2026-07-22","steps":11822,"restHR":48,"stressAvg":31,"bbMax":87,"bbMin":10,"intMod":1,"intVig":7},{"d":"2026-07-23","steps":6872,"restHR":47,"stressAvg":35,"bbMax":100,"bbMin":15,"intMod":0,"intVig":1},{"d":"2026-07-24","steps":5968,"restHR":52,"stressAvg":35,"bbMax":74,"bbMin":12,"intMod":13,"intVig":21},{"d":"2026-07-25","steps":8529,"restHR":54,"stressAvg":50,"bbMax":34,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-07-26","steps":6890,"restHR":47,"stressAvg":26,"bbMax":55,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-07-27","steps":10925,"restHR":46,"stressAvg":28,"bbMax":100,"bbMin":21,"intMod":14,"intVig":13},{"d":"2026-07-28","steps":13029,"restHR":46,"stressAvg":38,"bbMax":100,"bbMin":8,"intMod":11,"intVig":16},{"d":"2026-07-29","steps":7578,"restHR":50,"stressAvg":42,"bbMax":81,"bbMin":8,"intMod":0,"intVig":0},{"d":"2026-07-30","steps":9455,"restHR":50,"stressAvg":35,"bbMax":75,"bbMin":10,"intMod":4,"intVig":10},{"d":"2026-07-31","steps":2933,"restHR":53,"stressAvg":43,"bbMax":79,"bbMin":7,"intMod":0,"intVig":0},{"d":"2026-08-01","steps":13615,"restHR":63,"stressAvg":43,"bbMax":25,"bbMin":5,"intMod":28,"intVig":22},{"d":"2026-08-02","steps":8582,"restHR":56,"stressAvg":40,"bbMax":68,"bbMin":8,"intMod":0,"intVig":0},{"d":"2026-08-03","steps":7269,"restHR":55,"stressAvg":39,"bbMax":75,"bbMin":11,"intMod":1,"intVig":4},{"d":"2026-08-04","steps":13415,"restHR":56,"stressAvg":50,"bbMax":63,"bbMin":5,"intMod":42,"intVig":6},{"d":"2026-08-05","steps":7791,"restHR":60,"stressAvg":52,"bbMax":34,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-08-06","steps":5915,"restHR":59,"stressAvg":50,"bbMax":28,"bbMin":5,"intMod":7,"intVig":7},{"d":"2026-08-07","steps":6273,"restHR":60,"stressAvg":65,"bbMax":17,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-08","steps":2876,"restHR":61,"stressAvg":57,"bbMax":23,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-09","steps":3972,"restHR":54,"stressAvg":44,"bbMax":68,"bbMin":5,"intMod":12,"intVig":12},{"d":"2026-08-10","steps":4553,"restHR":62,"stressAvg":60,"bbMax":26,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-08-11","steps":9040,"restHR":62,"stressAvg":46,"bbMax":32,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-12","steps":8065,"restHR":57,"stressAvg":40,"bbMax":64,"bbMin":6,"intMod":0,"intVig":0},{"d":"2026-08-13","steps":12590,"restHR":54,"stressAvg":42,"bbMax":70,"bbMin":5,"intMod":61,"intVig":4},{"d":"2026-08-14","steps":6619,"restHR":59,"stressAvg":48,"bbMax":42,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-15","steps":2958,"restHR":54,"stressAvg":34,"bbMax":82,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-16","steps":4268,"restHR":54,"stressAvg":33,"bbMax":66,"bbMin":17,"intMod":0,"intVig":2},{"d":"2026-08-17","steps":10165,"restHR":51,"stressAvg":39,"bbMax":96,"bbMin":9,"intMod":2,"intVig":6},{"d":"2026-08-18","steps":6740,"restHR":55,"stressAvg":38,"bbMax":65,"bbMin":9,"intMod":1,"intVig":1},{"d":"2026-08-19","steps":6273,"restHR":53,"stressAvg":37,"bbMax":74,"bbMin":11,"intMod":2,"intVig":3},{"d":"2026-08-20","steps":10137,"restHR":51,"stressAvg":40,"bbMax":92,"bbMin":7,"intMod":11,"intVig":27},{"d":"2026-08-21","steps":1700,"restHR":56,"stressAvg":33,"bbMax":59,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-22","steps":6901,"restHR":52,"stressAvg":45,"bbMax":90,"bbMin":5,"intMod":12,"intVig":18},{"d":"2026-08-23","steps":6666,"restHR":51,"stressAvg":38,"bbMax":43,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-08-24","steps":6000,"restHR":48,"stressAvg":29,"bbMax":100,"bbMin":20,"intMod":1,"intVig":1},{"d":"2026-08-25","steps":7815,"restHR":48,"stressAvg":38,"bbMax":99,"bbMin":8,"intMod":0,"intVig":2},{"d":"2026-08-26","steps":10296,"restHR":53,"stressAvg":34,"bbMax":62,"bbMin":8,"intMod":28,"intVig":31},{"d":"2026-08-27","steps":5371,"restHR":50,"stressAvg":40,"bbMax":92,"bbMin":12,"intMod":2,"intVig":1},{"d":"2026-08-28","steps":5104,"restHR":53,"stressAvg":33,"bbMax":73,"bbMin":7,"intMod":7,"intVig":9},{"d":"2026-08-29","steps":2156,"restHR":55,"stressAvg":31,"bbMax":84,"bbMin":15,"intMod":0,"intVig":0},{"d":"2026-08-30","steps":10382,"restHR":52,"stressAvg":36,"bbMax":78,"bbMin":10,"intMod":0,"intVig":4},{"d":"2026-08-31","steps":5446,"restHR":54,"stressAvg":42,"bbMax":81,"bbMin":10,"intMod":8,"intVig":22},{"d":"2026-09-01","steps":5051,"restHR":53,"stressAvg":32,"bbMax":64,"bbMin":9,"intMod":0,"intVig":0},{"d":"2026-09-02","steps":2121,"restHR":48,"stressAvg":26,"bbMax":100,"bbMin":29,"intMod":0,"intVig":0},{"d":"2026-09-03","steps":5909,"restHR":48,"stressAvg":38,"bbMax":100,"bbMin":10,"intMod":1,"intVig":5},{"d":"2026-09-04","steps":10154,"restHR":56,"stressAvg":46,"bbMax":35,"bbMin":5,"intMod":52,"intVig":0},{"d":"2026-09-05","steps":4732,"restHR":53,"stressAvg":34,"bbMax":81,"bbMin":7,"intMod":0,"intVig":0},{"d":"2026-09-06","steps":13835,"restHR":50,"stressAvg":38,"bbMax":82,"bbMin":8,"intMod":4,"intVig":3},{"d":"2026-09-07","steps":3508,"restHR":51,"stressAvg":25,"bbMax":96,"bbMin":17,"intMod":13,"intVig":10},{"d":"2026-09-08","steps":10062,"restHR":50,"stressAvg":47,"bbMax":100,"bbMin":5,"intMod":19,"intVig":5},{"d":"2026-09-09","steps":8934,"restHR":54,"stressAvg":36,"bbMax":27,"bbMin":5,"intMod":1,"intVig":20},{"d":"2026-09-10","steps":13765,"restHR":51,"stressAvg":40,"bbMax":86,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-09-11","steps":3122,"restHR":56,"stressAvg":37,"bbMax":67,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-09-12","steps":7299,"restHR":56,"stressAvg":38,"bbMax":67,"bbMin":17,"intMod":5,"intVig":7},{"d":"2026-09-13","steps":4231,"restHR":55,"stressAvg":36,"bbMax":73,"bbMin":13,"intMod":0,"intVig":0},{"d":"2026-09-14","steps":3927,"restHR":51,"stressAvg":28,"bbMax":72,"bbMin":9,"intMod":2,"intVig":5},{"d":"2026-09-15","steps":6095,"restHR":49,"stressAvg":32,"bbMax":100,"bbMin":20,"intMod":16,"intVig":18},{"d":"2026-09-16","steps":2594,"restHR":48,"stressAvg":25,"bbMax":100,"bbMin":30,"intMod":0,"intVig":0},{"d":"2026-09-17","steps":9264,"restHR":48,"stressAvg":38,"bbMax":100,"bbMin":7,"intMod":3,"intVig":4},{"d":"2026-09-18","steps":3043,"restHR":55,"stressAvg":35,"bbMax":65,"bbMin":5,"intMod":1,"intVig":2},{"d":"2026-09-19","steps":4421,"restHR":50,"stressAvg":30,"bbMax":87,"bbMin":14,"intMod":0,"intVig":0},{"d":"2026-09-20","steps":2224,"restHR":52,"stressAvg":28,"bbMax":78,"bbMin":17,"intMod":0,"intVig":0},{"d":"2026-09-21","steps":765,"restHR":54,"stressAvg":71,"bbMax":5,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-09-22","steps":6682,"restHR":52,"stressAvg":29,"bbMax":49,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-09-23","steps":6050,"restHR":47,"stressAvg":37,"bbMax":98,"bbMin":6,"intMod":2,"intVig":5},{"d":"2026-09-24","steps":7194,"restHR":49,"stressAvg":30,"bbMax":78,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-09-25","steps":2335,"restHR":52,"stressAvg":34,"bbMax":83,"bbMin":14,"intMod":0,"intVig":0},{"d":"2026-09-26","steps":3227,"restHR":50,"stressAvg":35,"bbMax":87,"bbMin":16,"intMod":1,"intVig":1},{"d":"2026-09-27","steps":8509,"restHR":55,"stressAvg":40,"bbMax":35,"bbMin":5,"intMod":3,"intVig":2},{"d":"2026-09-28","steps":4719,"restHR":52,"stressAvg":41,"bbMax":100,"bbMin":13,"intMod":1,"intVig":2},{"d":"2026-09-29","steps":16026,"restHR":55,"stressAvg":52,"bbMax":25,"bbMin":5,"intMod":69,"intVig":24},{"d":"2026-09-30","steps":5874,"restHR":54,"stressAvg":35,"bbMax":80,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-01","steps":2419,"restHR":49,"stressAvg":33,"bbMax":100,"bbMin":16,"intMod":0,"intVig":0},{"d":"2026-10-02","steps":5183,"restHR":51,"stressAvg":34,"bbMax":99,"bbMin":16,"intMod":0,"intVig":0},{"d":"2026-10-03","steps":3066,"restHR":52,"stressAvg":30,"bbMax":98,"bbMin":20,"intMod":0,"intVig":0},{"d":"2026-10-04","steps":10404,"restHR":49,"stressAvg":25,"bbMax":100,"bbMin":30,"intMod":0,"intVig":1},{"d":"2026-10-05","steps":22926,"restHR":51,"stressAvg":36,"bbMax":96,"bbMin":27,"intMod":107,"intVig":0},{"d":"2026-10-06","steps":5738,"restHR":54,"stressAvg":30,"bbMax":73,"bbMin":24,"intMod":1,"intVig":2},{"d":"2026-10-07","steps":4142,"restHR":50,"stressAvg":24,"bbMax":100,"bbMin":32,"intMod":1,"intVig":2},{"d":"2026-10-08","steps":9090,"restHR":49,"stressAvg":34,"bbMax":100,"bbMin":24,"intMod":2,"intVig":17},{"d":"2026-10-09","steps":1317,"restHR":55,"stressAvg":44,"bbMax":18,"bbMin":10,"intMod":0,"intVig":0},{"d":"2026-10-10","steps":2622,"restHR":53,"stressAvg":45,"bbMax":43,"bbMin":7,"intMod":0,"intVig":1},{"d":"2026-10-11","steps":3188,"restHR":52,"stressAvg":42,"bbMax":78,"bbMin":11,"intMod":2,"intVig":6},{"d":"2026-10-12","steps":1542,"restHR":56,"stressAvg":59,"bbMax":54,"bbMin":5,"intMod":1,"intVig":4},{"d":"2026-10-13","steps":6432,"restHR":56,"stressAvg":49,"bbMax":23,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-14","steps":1445,"restHR":57,"stressAvg":32,"bbMax":81,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-15","steps":4653,"restHR":54,"stressAvg":33,"bbMax":93,"bbMin":20,"intMod":0,"intVig":0},{"d":"2026-10-16","steps":5757,"restHR":56,"stressAvg":42,"bbMax":67,"bbMin":10,"intMod":0,"intVig":0},{"d":"2026-10-17","steps":3090,"restHR":54,"stressAvg":37,"bbMax":90,"bbMin":11,"intMod":0,"intVig":0},{"d":"2026-10-18","steps":8354,"restHR":52,"stressAvg":33,"bbMax":84,"bbMin":16,"intMod":1,"intVig":1},{"d":"2026-10-19","steps":6229,"restHR":51,"stressAvg":23,"bbMax":90,"bbMin":20,"intMod":2,"intVig":14},{"d":"2026-10-20","steps":5543,"restHR":51,"stressAvg":45,"bbMax":100,"bbMin":5,"intMod":0,"intVig":3},{"d":"2026-10-21","steps":6042,"restHR":52,"stressAvg":25,"bbMax":87,"bbMin":30,"intMod":0,"intVig":1},{"d":"2026-10-22","steps":9466,"restHR":50,"stressAvg":44,"bbMax":100,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-23","steps":2794,"restHR":52,"stressAvg":29,"bbMax":83,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-24","steps":3683,"restHR":53,"stressAvg":34,"bbMax":97,"bbMin":20,"intMod":1,"intVig":1},{"d":"2026-10-25","steps":4077,"restHR":52,"stressAvg":24,"bbMax":76,"bbMin":16,"intMod":2,"intVig":6},{"d":"2026-10-26","steps":11954,"restHR":48,"stressAvg":42,"bbMax":100,"bbMin":5,"intMod":16,"intVig":27},{"d":"2026-10-27","steps":4302,"restHR":55,"stressAvg":39,"bbMax":35,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-28","steps":6487,"restHR":51,"stressAvg":29,"bbMax":68,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-10-29","steps":6850,"restHR":53,"stressAvg":44,"bbMax":99,"bbMin":5,"intMod":4,"intVig":6},{"d":"2026-10-30","steps":3550,"restHR":56,"stressAvg":45,"bbMax":20,"bbMin":5,"intMod":0,"intVig":0},{"d":"2026-10-31","steps":3086,"restHR":51,"stressAvg":39,"bbMax":93,"bbMin":7,"intMod":0,"intVig":0},{"d":"2026-11-01","steps":11301,"restHR":54,"stressAvg":30,"bbMax":63,"bbMin":8,"intMod":0,"intVig":1},{"d":"2026-11-02","steps":13280,"restHR":52,"stressAvg":43,"bbMax":99,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-11-03","steps":7972,"restHR":56,"stressAvg":35,"bbMax":57,"bbMin":5,"intMod":0,"intVig":1},{"d":"2026-11-04","steps":8221,"restHR":52,"stressAvg":32,"bbMax":79,"bbMin":8,"intMod":0,"intVig":0},{"d":"2026-11-05","steps":9293,"restHR":56,"stressAvg":36,"bbMax":81,"bbMin":7,"intMod":12,"intVig":17},{"d":"2026-11-06","steps":2482,"restHR":57,"stressAvg":42,"bbMax":59,"bbMin":5,"intMod":0,"intVig":2},{"d":"2026-11-07","steps":4222,"restHR":57,"stressAvg":34,"bbMax":82,"bbMin":11,"intMod":0,"intVig":0},{"d":"2026-11-08","steps":7539,"restHR":55,"stressAvg":33,"bbMax":46,"bbMin":15,"intMod":2,"intVig":5},{"d":"2026-11-09","steps":3139,"restHR":51,"stressAvg":10,"bbMax":100,"bbMin":36,"intMod":0,"intVig":7}],
-"sleeps":[{"d":"2026-07-05","total":7.5,"deep":2,"light":4,"rem":1.5,"awake":0,"score":89},{"d":"2026-07-06","total":7.2,"deep":1,"light":5.1,"rem":1.1,"awake":0.1,"score":77},{"d":"2026-07-07","total":9.7,"deep":1.7,"light":5.5,"rem":2.4,"awake":0,"score":94},{"d":"2026-07-08","total":8.7,"deep":1.1,"light":6,"rem":1.6,"awake":0.1,"score":87},{"d":"2026-07-09","total":7.9,"deep":1.4,"light":4.1,"rem":2.4,"awake":0,"score":96},{"d":"2026-07-10","total":6.2,"deep":1.6,"light":4.4,"rem":0.2,"awake":0.5,"score":59},{"d":"2026-07-11","total":8.2,"deep":1.3,"light":5.7,"rem":1.2,"awake":0,"score":86},{"d":"2026-07-12","total":6.5,"deep":1.9,"light":3.8,"rem":0.9,"awake":0,"score":79},{"d":"2026-07-13","total":6.5,"deep":1.6,"light":3.9,"rem":1,"awake":0,"score":77},{"d":"2026-07-14","total":9.5,"deep":1.3,"light":5.2,"rem":3,"awake":0.1,"score":86},{"d":"2026-07-15","total":8.8,"deep":1.2,"light":5.2,"rem":2.4,"awake":0.2,"score":86},{"d":"2026-07-16","total":6.6,"deep":1.3,"light":4,"rem":1.4,"awake":0.4,"score":78},{"d":"2026-07-17","total":6.4,"deep":1.9,"light":3,"rem":1.5,"awake":0,"score":79},{"d":"2026-07-18","total":7.6,"deep":0.8,"light":5.4,"rem":1.4,"awake":0.2,"score":81},{"d":"2026-07-19","total":4.7,"deep":1.3,"light":2.2,"rem":1.2,"awake":0,"score":60},{"d":"2026-07-20","total":8.4,"deep":1.1,"light":5.7,"rem":1.6,"awake":0,"score":85},{"d":"2026-07-21","total":9.9,"deep":1.5,"light":6.7,"rem":1.7,"awake":0.5,"score":86},{"d":"2026-07-22","total":7.9,"deep":1.7,"light":4.3,"rem":1.9,"awake":0.1,"score":94},{"d":"2026-07-23","total":7.9,"deep":1.6,"light":4.5,"rem":1.8,"awake":0.1,"score":84},{"d":"2026-07-24","total":8,"deep":1.1,"light":5.9,"rem":1,"awake":0,"score":78},{"d":"2026-07-25","total":5.9,"deep":1.1,"light":4.5,"rem":0.3,"awake":0.1,"score":53},{"d":"2026-07-26","total":5.7,"deep":1.6,"light":3.3,"rem":0.9,"awake":0,"score":71},{"d":"2026-07-27","total":9,"deep":0.8,"light":5.4,"rem":2.7,"awake":0,"score":91},{"d":"2026-07-28","total":8.8,"deep":1.7,"light":4.9,"rem":2.2,"awake":0,"score":100},{"d":"2026-07-29","total":8.4,"deep":1.3,"light":5.7,"rem":1.4,"awake":0.4,"score":87},{"d":"2026-07-30","total":6,"deep":1,"light":4.2,"rem":0.8,"awake":0.1,"score":69},{"d":"2026-07-31","total":9.2,"deep":0.8,"light":5.7,"rem":2.8,"awake":0,"score":85},{"d":"2026-08-01","total":6.1,"deep":1.1,"light":5,"rem":0,"awake":0,"score":40},{"d":"2026-08-02","total":7.7,"deep":1.1,"light":5.8,"rem":0.7,"awake":0,"score":77},{"d":"2026-08-03","total":9.6,"deep":1.2,"light":6.3,"rem":2.1,"awake":0,"score":88},{"d":"2026-08-04","total":9.2,"deep":1.1,"light":7.3,"rem":0.7,"awake":0.7,"score":65},{"d":"2026-08-05","total":7.4,"deep":1.1,"light":5.4,"rem":0.9,"awake":0,"score":49},{"d":"2026-08-06","total":8,"deep":1.2,"light":6.4,"rem":0.4,"awake":0,"score":46},{"d":"2026-08-07","total":5.7,"deep":0.3,"light":4.6,"rem":0.8,"awake":0.1,"score":44},{"d":"2026-08-08","total":8.1,"deep":1.4,"light":6,"rem":0.6,"awake":0,"score":48},{"d":"2026-08-09","total":9.6,"deep":0.8,"light":6.3,"rem":2.6,"awake":0,"score":85},{"d":"2026-08-10","total":8.1,"deep":0.3,"light":7.1,"rem":0.6,"awake":1.2,"score":37},{"d":"2026-08-11","total":8.4,"deep":1.4,"light":6.2,"rem":0.8,"awake":0,"score":49},{"d":"2026-08-12","total":8.7,"deep":0.9,"light":5.8,"rem":2,"awake":0,"score":87},{"d":"2026-08-13","total":7.3,"deep":1.4,"light":4.4,"rem":1.5,"awake":0,"score":78},{"d":"2026-08-14","total":7.8,"deep":1.3,"light":5.3,"rem":1.1,"awake":0,"score":79},{"d":"2026-08-15","total":9.6,"deep":0.9,"light":6.5,"rem":2.2,"awake":0,"score":88},{"d":"2026-08-16","total":6.3,"deep":1.1,"light":4.2,"rem":1,"awake":0,"score":74},{"d":"2026-08-17","total":9.2,"deep":1.1,"light":6.6,"rem":1.5,"awake":0.2,"score":88},{"d":"2026-08-18","total":8.9,"deep":1.2,"light":6.4,"rem":1.3,"awake":0.2,"score":81},{"d":"2026-08-19","total":7.6,"deep":0.4,"light":6,"rem":1.3,"awake":0,"score":77},{"d":"2026-08-20","total":8,"deep":1,"light":4.8,"rem":2.2,"awake":0,"score":92},{"d":"2026-08-21","total":7.8,"deep":1.1,"light":5.1,"rem":1.7,"awake":0.2,"score":82},{"d":"2026-08-22","total":9,"deep":1.9,"light":4.9,"rem":2.3,"awake":0,"score":96},{"d":"2026-08-23","total":4,"deep":0.7,"light":3.2,"rem":0,"awake":0,"score":42},{"d":"2026-08-24","total":11,"deep":1.2,"light":7.3,"rem":2.5,"awake":0.3,"score":91},{"d":"2026-08-25","total":7.6,"deep":1.3,"light":4.8,"rem":1.6,"awake":0,"score":90},{"d":"2026-08-26","total":7.1,"deep":1.1,"light":4.8,"rem":1.2,"awake":2,"score":60},{"d":"2026-08-27","total":11.2,"deep":0.6,"light":7.2,"rem":3.5,"awake":0.7,"score":75},{"d":"2026-08-28","total":9.3,"deep":2.1,"light":4.8,"rem":2.4,"awake":0,"score":84},{"d":"2026-08-29","total":9.4,"deep":1.1,"light":6.6,"rem":1.7,"awake":0.2,"score":85},{"d":"2026-08-30","total":5.2,"deep":1.3,"light":3,"rem":1,"awake":0,"score":66},{"d":"2026-08-31","total":11.1,"deep":1.8,"light":7.3,"rem":1.9,"awake":0.4,"score":84},{"d":"2026-09-01","total":7.2,"deep":1.1,"light":4.1,"rem":1.9,"awake":0.1,"score":78},{"d":"2026-09-02","total":9.2,"deep":0.8,"light":6,"rem":2.4,"awake":0,"score":92},{"d":"2026-09-03","total":7.8,"deep":1,"light":5.6,"rem":1.2,"awake":0.4,"score":82},{"d":"2026-09-04","total":7.8,"deep":1,"light":6.4,"rem":0.4,"awake":0.7,"score":57},{"d":"2026-09-05","total":8.5,"deep":0.8,"light":5.2,"rem":2.5,"awake":0.2,"score":85},{"d":"2026-09-06","total":6.3,"deep":2,"light":3.6,"rem":0.7,"awake":0,"score":76},{"d":"2026-09-07","total":10.5,"deep":1.4,"light":6.9,"rem":2.1,"awake":0,"score":92},{"d":"2026-09-08","total":7.1,"deep":1.1,"light":5,"rem":1.1,"awake":0,"score":83},{"d":"2026-09-09","total":6.3,"deep":1.4,"light":4.9,"rem":0,"awake":0.3,"score":41},{"d":"2026-09-10","total":7.3,"deep":1,"light":4.7,"rem":1.6,"awake":0.2,"score":84},{"d":"2026-09-11","total":9,"deep":1.5,"light":6,"rem":1.5,"awake":0,"score":86},{"d":"2026-09-12","total":7.1,"deep":1.2,"light":4.9,"rem":1,"awake":0.2,"score":77},{"d":"2026-09-13","total":7.5,"deep":1.3,"light":4.1,"rem":2.1,"awake":0,"score":86},{"d":"2026-09-14","total":5.4,"deep":1.5,"light":3.1,"rem":0.8,"awake":0,"score":68},{"d":"2026-09-15","total":10.1,"deep":1.1,"light":6.3,"rem":2.7,"awake":0.1,"score":92},{"d":"2026-09-16","total":10.1,"deep":1.4,"light":6,"rem":2.8,"awake":0.1,"score":96},{"d":"2026-09-17","total":7.6,"deep":1.5,"light":4.2,"rem":1.9,"awake":0,"score":93},{"d":"2026-09-18","total":7.4,"deep":0.9,"light":5.7,"rem":0.8,"awake":0.5,"score":73},{"d":"2026-09-19","total":6.9,"deep":1.4,"light":4.5,"rem":1,"awake":0.5,"score":80},{"d":"2026-09-20","total":5.9,"deep":2,"light":2.7,"rem":1.2,"awake":0,"score":74},{"d":"2026-09-22","total":5.8,"deep":1.3,"light":3.8,"rem":0.8,"awake":0.2,"score":70},{"d":"2026-09-23","total":8.8,"deep":1,"light":5,"rem":2.9,"awake":0,"score":91},{"d":"2026-09-24","total":7.8,"deep":1.6,"light":3.9,"rem":2.3,"awake":0.1,"score":92},{"d":"2026-09-25","total":6.1,"deep":1.2,"light":4,"rem":0.8,"awake":0.1,"score":73},{"d":"2026-09-26","total":7.8,"deep":1.4,"light":5,"rem":1.4,"awake":0.7,"score":74},{"d":"2026-09-27","total":3.6,"deep":1.1,"light":2.2,"rem":0.2,"awake":0,"score":44},{"d":"2026-09-28","total":9.8,"deep":0.6,"light":6.5,"rem":2.6,"awake":0.2,"score":88},{"d":"2026-09-29","total":5.2,"deep":1,"light":3.8,"rem":0.5,"awake":0.4,"score":50},{"d":"2026-09-30","total":8.2,"deep":1.4,"light":5,"rem":1.8,"awake":0.1,"score":93},{"d":"2026-10-01","total":11,"deep":1.4,"light":6.4,"rem":3.2,"awake":0.3,"score":90},{"d":"2026-10-02","total":8.8,"deep":1.1,"light":5.5,"rem":2.2,"awake":0.2,"score":93},{"d":"2026-10-03","total":9.1,"deep":1.1,"light":5.5,"rem":2.5,"awake":0.2,"score":92},{"d":"2026-10-04","total":7.5,"deep":1.9,"light":4,"rem":1.6,"awake":0.1,"score":85},{"d":"2026-10-05","total":3,"deep":0.9,"light":2.1,"rem":0,"awake":0.8,"score":34},{"d":"2026-10-06","total":6,"deep":1.1,"light":4.2,"rem":0.7,"awake":0.2,"score":71},{"d":"2026-10-07","total":8.9,"deep":0.7,"light":6,"rem":2.3,"awake":0,"score":91},{"d":"2026-10-08","total":9.5,"deep":1.4,"light":5.2,"rem":3,"awake":0.1,"score":93},{"d":"2026-10-10","total":6.3,"deep":1.1,"light":3.9,"rem":1.3,"awake":0.4,"score":71},{"d":"2026-10-11","total":6.7,"deep":1.1,"light":4.4,"rem":1.3,"awake":0,"score":80},{"d":"2026-10-12","total":9.1,"deep":0.9,"light":6.6,"rem":1.6,"awake":0.5,"score":74},{"d":"2026-10-13","total":6.6,"deep":0.7,"light":5.9,"rem":0,"awake":0.5,"score":40},{"d":"2026-10-14","total":9.4,"deep":1.8,"light":6.2,"rem":1.5,"awake":0,"score":88},{"d":"2026-10-15","total":9.7,"deep":1.1,"light":5.4,"rem":3.2,"awake":0.1,"score":85},{"d":"2026-10-16","total":7.2,"deep":1.2,"light":5,"rem":1,"awake":0.2,"score":77},{"d":"2026-10-17","total":10.3,"deep":1.4,"light":6.3,"rem":2.6,"awake":0.5,"score":87},{"d":"2026-10-18","total":6.7,"deep":2.1,"light":3.3,"rem":1.3,"awake":0,"score":77},{"d":"2026-10-19","total":8.7,"deep":1.3,"light":5.7,"rem":1.6,"awake":0,"score":90},{"d":"2026-10-20","total":7.2,"deep":0.7,"light":5.7,"rem":0.8,"awake":0,"score":80},{"d":"2026-10-21","total":10.3,"deep":0.9,"light":6.7,"rem":2.6,"awake":0,"score":90},{"d":"2026-10-22","total":8.9,"deep":1.8,"light":4.8,"rem":2.4,"awake":0.2,"score":97},{"d":"2026-10-23","total":9.8,"deep":2,"light":4.8,"rem":3,"awake":0.2,"score":92},{"d":"2026-10-24","total":8.2,"deep":1,"light":5.3,"rem":1.9,"awake":0.3,"score":89},{"d":"2026-10-25","total":6.3,"deep":1.1,"light":3.8,"rem":1.4,"awake":0.2,"score":76},{"d":"2026-10-26","total":8.9,"deep":1,"light":5.1,"rem":2.9,"awake":0.2,"score":90},{"d":"2026-10-27","total":7.5,"deep":1.8,"light":4.5,"rem":1.1,"awake":0.1,"score":77},{"d":"2026-10-28","total":7.1,"deep":0.8,"light":4.8,"rem":1.4,"awake":0,"score":79},{"d":"2026-10-29","total":9.2,"deep":0.9,"light":6.1,"rem":2.2,"awake":0,"score":93},{"d":"2026-10-30","total":6.1,"deep":1.1,"light":4.8,"rem":0.1,"awake":0.2,"score":41},{"d":"2026-10-31","total":7.8,"deep":1.1,"light":4.3,"rem":2.3,"awake":0,"score":91},{"d":"2026-11-01","total":6.8,"deep":0.9,"light":4.6,"rem":1.4,"awake":0,"score":76},{"d":"2026-11-02","total":9.1,"deep":1.5,"light":6.1,"rem":1.5,"awake":0.2,"score":88},{"d":"2026-11-03","total":7,"deep":1.3,"light":3.8,"rem":1.9,"awake":0.1,"score":82},{"d":"2026-11-04","total":5.3,"deep":1.5,"light":2.9,"rem":0.9,"awake":0,"score":67},{"d":"2026-11-05","total":7.5,"deep":1.5,"light":4.9,"rem":1.1,"awake":0.2,"score":84},{"d":"2026-11-06","total":7.5,"deep":1.6,"light":4.9,"rem":0.9,"awake":0.1,"score":80},{"d":"2026-11-07","total":8.8,"deep":1,"light":5.7,"rem":2.2,"awake":0.1,"score":88},{"d":"2026-11-08","total":6.4,"deep":0.9,"light":4.8,"rem":0.7,"awake":0,"score":69},{"d":"2026-11-09","total":10.6,"deep":1.4,"light":6.2,"rem":2.9,"awake":0,"score":95}],
-"hrvs":[{"d":"2026-07-05","avg":81,"wAvg":null,"blLow":69,"blBal":75},{"d":"2026-07-06","avg":85,"wAvg":null,"blLow":69,"blBal":75},{"d":"2026-07-07","avg":85,"wAvg":null,"blLow":69,"blBal":75},{"d":"2026-07-08","avg":89,"wAvg":85,"blLow":69,"blBal":75},{"d":"2026-07-09","avg":97,"wAvg":87,"blLow":69,"blBal":75},{"d":"2026-07-10","avg":72,"wAvg":84,"blLow":69,"blBal":75},{"d":"2026-07-11","avg":74,"wAvg":83,"blLow":69,"blBal":75},{"d":"2026-07-12","avg":88,"wAvg":84,"blLow":69,"blBal":75},{"d":"2026-07-13","avg":92,"wAvg":85,"blLow":69,"blBal":75},{"d":"2026-07-14","avg":85,"wAvg":85,"blLow":70,"blBal":76},{"d":"2026-07-15","avg":82,"wAvg":84,"blLow":70,"blBal":76},{"d":"2026-07-16","avg":91,"wAvg":83,"blLow":70,"blBal":76},{"d":"2026-07-17","avg":73,"wAvg":83,"blLow":70,"blBal":76},{"d":"2026-07-18","avg":85,"wAvg":85,"blLow":70,"blBal":76},{"d":"2026-07-19","avg":85,"wAvg":84,"blLow":70,"blBal":76},{"d":"2026-07-20","avg":84,"wAvg":83,"blLow":70,"blBal":76},{"d":"2026-07-21","avg":94,"wAvg":85,"blLow":71,"blBal":76},{"d":"2026-07-22","avg":93,"wAvg":86,"blLow":71,"blBal":76},{"d":"2026-07-23","avg":97,"wAvg":87,"blLow":71,"blBal":77},{"d":"2026-07-24","avg":76,"wAvg":87,"blLow":71,"blBal":76},{"d":"2026-07-25","avg":56,"wAvg":82,"blLow":71,"blBal":77},{"d":"2026-07-26","avg":76,"wAvg":81,"blLow":71,"blBal":77},{"d":"2026-07-27","avg":95,"wAvg":83,"blLow":71,"blBal":77},{"d":"2026-07-28","avg":95,"wAvg":83,"blLow":71,"blBal":77},{"d":"2026-07-29","avg":84,"wAvg":81,"blLow":72,"blBal":77},{"d":"2026-07-30","avg":87,"wAvg":80,"blLow":72,"blBal":77},{"d":"2026-07-31","avg":77,"wAvg":80,"blLow":72,"blBal":77},{"d":"2026-08-01","avg":51,"wAvg":79,"blLow":71,"blBal":76},{"d":"2026-08-02","avg":72,"wAvg":79,"blLow":71,"blBal":76},{"d":"2026-08-03","avg":78,"wAvg":76,"blLow":71,"blBal":77},{"d":"2026-08-04","avg":65,"wAvg":72,"blLow":71,"blBal":77},{"d":"2026-08-05","avg":58,"wAvg":69,"blLow":71,"blBal":77},{"d":"2026-08-06","avg":49,"wAvg":63,"blLow":71,"blBal":77},{"d":"2026-08-07","avg":40,"wAvg":58,"blLow":71,"blBal":77},{"d":"2026-08-08","avg":44,"wAvg":57,"blLow":70,"blBal":76},{"d":"2026-08-09","avg":75,"wAvg":57,"blLow":70,"blBal":76},{"d":"2026-08-10","avg":42,"wAvg":52,"blLow":70,"blBal":75},{"d":"2026-08-11","avg":47,"wAvg":50,"blLow":69,"blBal":75},{"d":"2026-08-12","avg":67,"wAvg":51,"blLow":69,"blBal":75},{"d":"2026-08-13","avg":76,"wAvg":54,"blLow":67,"blBal":74},{"d":"2026-08-14","avg":62,"wAvg":57,"blLow":66,"blBal":72},{"d":"2026-08-15","avg":75,"wAvg":62,"blLow":64,"blBal":71},{"d":"2026-08-16","avg":67,"wAvg":61,"blLow":64,"blBal":71},{"d":"2026-08-17","avg":82,"wAvg":67,"blLow":62,"blBal":70},{"d":"2026-08-18","avg":66,"wAvg":70,"blLow":62,"blBal":69},{"d":"2026-08-19","avg":72,"wAvg":71,"blLow":61,"blBal":69},{"d":"2026-08-20","avg":87,"wAvg":73,"blLow":62,"blBal":69},{"d":"2026-08-21","avg":66,"wAvg":73,"blLow":61,"blBal":69},{"d":"2026-08-22","avg":70,"wAvg":73,"blLow":61,"blBal":69},{"d":"2026-08-23","avg":66,"wAvg":72,"blLow":61,"blBal":68},{"d":"2026-08-24","avg":94,"wAvg":74,"blLow":61,"blBal":68},{"d":"2026-08-25","avg":90,"wAvg":77,"blLow":61,"blBal":68},{"d":"2026-08-26","avg":76,"wAvg":78,"blLow":61,"blBal":68},{"d":"2026-08-27","avg":79,"wAvg":76,"blLow":61,"blBal":68},{"d":"2026-08-28","avg":74,"wAvg":78,"blLow":61,"blBal":68},{"d":"2026-08-29","avg":75,"wAvg":79,"blLow":61,"blBal":68},{"d":"2026-08-30","avg":81,"wAvg":81,"blLow":61,"blBal":68},{"d":"2026-08-31","avg":79,"wAvg":79,"blLow":60,"blBal":67},{"d":"2026-09-01","avg":72,"wAvg":77,"blLow":61,"blBal":68},{"d":"2026-09-02","avg":95,"wAvg":79,"blLow":61,"blBal":68},{"d":"2026-09-03","avg":98,"wAvg":82,"blLow":61,"blBal":68},{"d":"2026-09-04","avg":59,"wAvg":79,"blLow":61,"blBal":68},{"d":"2026-09-05","avg":72,"wAvg":79,"blLow":61,"blBal":68},{"d":"2026-09-06","avg":78,"wAvg":78,"blLow":61,"blBal":68},{"d":"2026-09-07","avg":88,"wAvg":79,"blLow":61,"blBal":68},{"d":"2026-09-08","avg":92,"wAvg":82,"blLow":61,"blBal":68},{"d":"2026-09-09","avg":57,"wAvg":76,"blLow":61,"blBal":68},{"d":"2026-09-10","avg":86,"wAvg":75,"blLow":61,"blBal":68},{"d":"2026-09-11","avg":66,"wAvg":76,"blLow":61,"blBal":68},{"d":"2026-09-12","avg":65,"wAvg":75,"blLow":61,"blBal":68},{"d":"2026-09-13","avg":70,"wAvg":74,"blLow":61,"blBal":68},{"d":"2026-09-14","avg":79,"wAvg":73,"blLow":62,"blBal":68},{"d":"2026-09-15","avg":87,"wAvg":72,"blLow":62,"blBal":69},{"d":"2026-09-16","avg":92,"wAvg":77,"blLow":62,"blBal":68},{"d":"2026-09-17","avg":90,"wAvg":78,"blLow":62,"blBal":68},{"d":"2026-09-18","avg":72,"wAvg":79,"blLow":62,"blBal":68},{"d":"2026-09-19","avg":74,"wAvg":80,"blLow":62,"blBal":68},{"d":"2026-09-20","avg":72,"wAvg":81,"blLow":62,"blBal":68},{"d":"2026-09-22","avg":67,"wAvg":77,"blLow":61,"blBal":68},{"d":"2026-09-23","avg":93,"wAvg":78,"blLow":62,"blBal":68},{"d":"2026-09-24","avg":77,"wAvg":76,"blLow":62,"blBal":68},{"d":"2026-09-25","avg":82,"wAvg":77,"blLow":62,"blBal":68},{"d":"2026-09-26","avg":76,"wAvg":77,"blLow":62,"blBal":68},{"d":"2026-09-27","avg":65,"wAvg":76,"blLow":62,"blBal":68},{"d":"2026-09-28","avg":81,"wAvg":77,"blLow":61,"blBal":68},{"d":"2026-09-29","avg":57,"wAvg":75,"blLow":61,"blBal":68},{"d":"2026-09-30","avg":68,"wAvg":72,"blLow":61,"blBal":68},{"d":"2026-10-01","avg":79,"wAvg":72,"blLow":62,"blBal":68},{"d":"2026-10-02","avg":80,"wAvg":72,"blLow":62,"blBal":68},{"d":"2026-10-03","avg":75,"wAvg":72,"blLow":62,"blBal":68},{"d":"2026-10-04","avg":80,"wAvg":74,"blLow":62,"blBal":68},{"d":"2026-10-05","avg":80,"wAvg":74,"blLow":61,"blBal":68},{"d":"2026-10-06","avg":75,"wAvg":77,"blLow":61,"blBal":68},{"d":"2026-10-07","avg":89,"wAvg":80,"blLow":61,"blBal":67},{"d":"2026-10-08","avg":93,"wAvg":81,"blLow":61,"blBal":68},{"d":"2026-10-10","avg":64,"wAvg":80,"blLow":61,"blBal":68},{"d":"2026-10-11","avg":74,"wAvg":78,"blLow":62,"blBal":68},{"d":"2026-10-12","avg":56,"wAvg":74,"blLow":61,"blBal":67},{"d":"2026-10-13","avg":35,"wAvg":65,"blLow":61,"blBal":67},{"d":"2026-10-14","avg":65,"wAvg":62,"blLow":61,"blBal":67},{"d":"2026-10-15","avg":66,"wAvg":58,"blLow":61,"blBal":68},{"d":"2026-10-16","avg":65,"wAvg":59,"blLow":61,"blBal":68},{"d":"2026-10-17","avg":67,"wAvg":60,"blLow":61,"blBal":67},{"d":"2026-10-18","avg":76,"wAvg":60,"blLow":61,"blBal":67},{"d":"2026-10-19","avg":70,"wAvg":62,"blLow":60,"blBal":66},{"d":"2026-10-20","avg":89,"wAvg":71,"blLow":59,"blBal":65},{"d":"2026-10-21","avg":79,"wAvg":73,"blLow":59,"blBal":65},{"d":"2026-10-22","avg":83,"wAvg":75,"blLow":59,"blBal":65},{"d":"2026-10-23","avg":72,"wAvg":76,"blLow":59,"blBal":65},{"d":"2026-10-24","avg":78,"wAvg":78,"blLow":59,"blBal":65},{"d":"2026-10-25","avg":71,"wAvg":77,"blLow":59,"blBal":65},{"d":"2026-10-26","avg":85,"wAvg":79,"blLow":59,"blBal":65},{"d":"2026-10-27","avg":53,"wAvg":74,"blLow":59,"blBal":65},{"d":"2026-10-28","avg":58,"wAvg":71,"blLow":59,"blBal":65},{"d":"2026-10-29","avg":73,"wAvg":69,"blLow":59,"blBal":66},{"d":"2026-10-30","avg":47,"wAvg":65,"blLow":59,"blBal":66},{"d":"2026-10-31","avg":75,"wAvg":65,"blLow":60,"blBal":66},{"d":"2026-11-01","avg":66,"wAvg":64,"blLow":60,"blBal":66},{"d":"2026-11-02","avg":75,"wAvg":63,"blLow":60,"blBal":66},{"d":"2026-11-03","avg":67,"wAvg":65,"blLow":60,"blBal":66},{"d":"2026-11-04","avg":69,"wAvg":67,"blLow":60,"blBal":66},{"d":"2026-11-05","avg":69,"wAvg":66,"blLow":60,"blBal":66},{"d":"2026-11-06","avg":59,"wAvg":69,"blLow":59,"blBal":65},{"d":"2026-11-07","avg":63,"wAvg":67,"blLow":59,"blBal":65},{"d":"2026-11-08","avg":51,"wAvg":64,"blLow":59,"blBal":65},{"d":"2026-11-09","avg":73,"wAvg":64,"blLow":61,"blBal":67}],
-"wts":[{"d":"2026-07-04","kg":80},{"d":"2026-07-29","kg":78},{"d":"2026-08-01","kg":76}]};
+const SB_URL='https://gytxwjlicawlfdehszil.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5dHh3amxpY2F3bGZkZWhzemlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1MTUyMzgsImV4cCI6MjEwMTA5MTIzOH0.LIBV2W0FTq4MHlyO2Z4iiPvBBGBP1btJaJ-qzUrig64';
+let session=null,profile=null;
 
-// Helpers
-const fmt=(n,d=1)=>n!=null?n.toFixed(d):'—';
-const fmtInt=n=>n!=null?Math.round(n).toLocaleString():'—';
-const short=d=>{const p=d.split('-');return p[2]+'/'+p[1]};
-const typeHe={running:'🏃 ריצה',treadmill_running:'🏃 הליכון',indoor_cycling:'🚴 אופני כושר',walking:'🚶 הליכה',multi_sport:'💪 ספורט משולב',pilates:'🧘 פילאטיס'};
-const typeColor={running:'#00e5ff',treadmill_running:'#00e5ff',indoor_cycling:'#bf5af2',walking:'#30d158',multi_sport:'#ff9f0a',pilates:'#ff375f'};
-const rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// --- Supabase helpers ---
+async function sb(path,opts={}){
+  const h={'apikey':SB_KEY,'Content-Type':'application/json',...(opts.headers||{})};
+  if(session?.access_token)h['Authorization']='Bearer '+session.access_token;
+  const r=await fetch(SB_URL+path,{...opts,headers:h});
+  return r.json();
+}
+function sbAuth(path,body){return sb('/auth/v1'+path,{method:'POST',body:JSON.stringify(body)})}
+function sbRest(table,query=''){return sb('/rest/v1/'+table+'?'+query,{headers:{'Prefer':'return=representation'}})}
+function sbInsert(table,body){return sb('/rest/v1/'+table,{method:'POST',body:JSON.stringify(body),headers:{'Prefer':'return=representation'}})}
+function sbPatch(table,query,body){return sb('/rest/v1/'+table+'?'+query,{method:'PATCH',body:JSON.stringify(body),headers:{'Prefer':'return=representation'}})}
 
-// Stats
-const totalDist=D.acts.reduce((s,a)=>s+a.dist,0);
-const totalCal=D.acts.reduce((s,a)=>s+a.cal,0);
-const daysHR=D.days.filter(d=>d.restHR>0);
-const avgHR=daysHR.length?Math.round(daysHR.reduce((s,d)=>s+d.restHR,0)/daysHR.length):0;
-const sleepsS=D.sleeps.filter(s=>s.score>0);
-const avgSleep=sleepsS.length?Math.round(sleepsS.reduce((s,n)=>s+n.score,0)/sleepsS.length):0;
+// --- Auth ---
+function toggleEmail(){document.getElementById('email-form').classList.toggle('show')}
+function authMsg(t){document.getElementById('auth-msg').textContent=t}
 
-// Hero
-document.getElementById('hero').innerHTML=[
-  {l:'פעילויות',v:D.acts.length,u:'',s:`${fmt(totalDist,1)} ק״מ סה״כ`,hi:0},
-  {l:'מרחק כולל',v:fmt(totalDist,1),u:'ק״מ',s:`${fmtInt(totalCal)} קלוריות`,hi:1},
-  {l:'דופק מנוחה ⌀',v:avgHR,u:'bpm',s:`${daysHR.length} ימים`,hi:0},
-  {l:'ציון שינה ⌀',v:avgSleep,u:'',s:`${sleepsS.length} לילות`,hi:0},
-].map(m=>`<div class="c${m.hi?' hi':''}"><div class="l">${m.l}</div><div class="v">${m.v}<span class="u">${m.u}</span></div><div class="s">${m.s}</div></div>`).join('');
+function signInGoogle(){
+  window.location.href=SB_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname);
+}
 
-// Week comparison
-const thisWeekStart='2026-11-02';
-const twActs=D.acts.filter(a=>a.d>=thisWeekStart);
-const prev4=[];
-for(let w=1;w<=4;w++){const s=new Date(thisWeekStart);s.setDate(s.getDate()-7*w);const e=new Date(s);e.setDate(e.getDate()+6);const ss=s.toISOString().slice(0,10),ee=e.toISOString().slice(0,10);prev4.push(D.acts.filter(a=>a.d>=ss&&a.d<=ee))}
-const avg4=k=>{const vals=prev4.map(w=>w.reduce((s,a)=>s+(a[k]||0),0));return vals.reduce((s,v)=>s+v,0)/4};
-const twDist=twActs.reduce((s,a)=>s+a.dist,0),twDur=twActs.reduce((s,a)=>s+a.dur,0),twCal=twActs.reduce((s,a)=>s+a.cal,0);
+async function signInEmail(){
+  const email=document.getElementById('email-input').value.trim();
+  const pass=document.getElementById('pass-input').value;
+  if(!email||pass.length<6){authMsg('נא למלא אימייל וסיסמה (6+ תווים)');return}
+  authMsg('מתחבר...');
+  let res=await sbAuth('/token?grant_type=password',{email,password:pass});
+  if(res.error&&res.error.message?.includes('Invalid login')){
+    res=await sbAuth('/signup',{email,password:pass});
+    if(res.error){authMsg(res.error.message);return}
+    if(!res.access_token){authMsg('נשלח אימייל אימות — בדוק את התיבה');return}
+  }else if(res.error){authMsg(res.error.message);return}
+  session=res;localStorage.setItem('sb_session',JSON.stringify(res));onAuth();
+}
 
-document.getElementById('weekCompare').innerHTML=[
-  {l:'אימונים',v:twActs.length,a:fmt(prev4.map(w=>w.length).reduce((s,v)=>s+v,0)/4,1)},
-  {l:'מרחק',v:fmt(twDist,1)+' ק״מ',a:fmt(avg4('dist'),1)+' ק״מ'},
-  {l:'זמן',v:Math.round(twDur)+' דק׳',a:Math.round(avg4('dur'))+' דק׳'},
-  {l:'קלוריות',v:fmtInt(twCal),a:fmtInt(avg4('cal'))},
-].map(m=>`<div class="c"><div class="l">${m.l}</div><div class="v" style="font-size:24px">${m.v}</div><div class="s">ממוצע 4 שבועות: ${m.a}</div></div>`).join('');
+function signOut(){
+  session=null;profile=null;localStorage.removeItem('sb_session');
+  showScreen('auth');document.getElementById('tab-bar').classList.remove('show');
+  document.getElementById('fab').classList.remove('show');
+}
 
-// Chart defaults
-Chart.defaults.color='rgba(235,235,245,0.6)';
-Chart.defaults.font.family="'Rajdhani',system-ui,sans-serif";
-Chart.defaults.animation.duration=rm?0:600;
-const gc='rgba(255,255,255,0.06)';
-const sc=y=>({x:{grid:{color:gc},ticks:{maxTicksLimit:8}},y:{grid:{color:gc},title:{display:!!y,text:y,color:'rgba(235,235,245,0.4)'}}});
-const tt={backgroundColor:'#2c2c2e',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#f5f5f7',bodyColor:'#f5f5f7',padding:10,cornerRadius:8};
+async function onAuth(){
+  showScreen('loading');
+  const profiles=await sbRest('profiles','id=eq.'+session.user.id+'&select=*');
+  if(Array.isArray(profiles)&&profiles.length){
+    profile=profiles[0];
+    if(!profile.primary_sport){showScreen('onboarding');return}
+    enterApp();
+  }else{showScreen('onboarding')}
+}
 
-// Donut
-const byType={};
-D.acts.forEach(a=>{const k=a.t;if(!byType[k])byType[k]={count:0,dist:0};byType[k].count++;byType[k].dist+=a.dist});
-const tKeys=Object.keys(byType).sort((a,b)=>byType[b].count-byType[a].count);
-new Chart(document.getElementById('donut'),{type:'doughnut',data:{labels:tKeys.map(k=>typeHe[k]||k),datasets:[{data:tKeys.map(k=>byType[k].count),backgroundColor:tKeys.map(k=>typeColor[k]||'#636366'),borderWidth:0,hoverOffset:8}]},options:{cutout:'65%',plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} פעילויות`}}}}});
-document.getElementById('legend').innerHTML=tKeys.map(k=>`<li><span class="ld" style="background:${typeColor[k]||'#636366'}"></span>${typeHe[k]||k}<span class="lv">${byType[k].count} · ${fmt(byType[k].dist,1)} ק״מ</span></li>`).join('');
+// --- Onboarding ---
+let obSport='',obGoals=[];
+function pickSport(el){
+  document.querySelectorAll('.sport-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');obSport=el.dataset.sport;
+}
+function toggleGoal(el){
+  el.classList.toggle('sel');
+  const g=el.dataset.goal;
+  obGoals=el.classList.contains('sel')?[...obGoals,g]:obGoals.filter(x=>x!==g);
+}
+function nextOb(step){
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ob-dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('ob-step-'+step).classList.add('active');
+  document.getElementById('od'+step).classList.add('active');
+}
+async function saveOnboarding(){
+  const key=document.getElementById('garmin-key-input').value.trim();
+  const body={primary_sport:obSport||'other',goals:obGoals};
+  if(key)body.garmin_api_key_encrypted=key;
+  await sbPatch('profiles','id=eq.'+session.user.id,body);
+  profile={...profile,...body};enterApp();
+}
 
-// Training Load
-new Chart(document.getElementById('loadChart'),{type:'line',data:{labels:D.acts.map(a=>short(a.d)),datasets:[{label:'עומס אימון',data:D.acts.map(a=>a.load),borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,0.08)',fill:true,tension:.3,pointRadius:3,pointHoverRadius:6},{label:'אפקט אירובי',data:D.acts.map(a=>a.aero),borderColor:'#bf5af2',backgroundColor:'rgba(191,90,242,0.08)',fill:true,tension:.3,pointRadius:2,pointHoverRadius:5,yAxisID:'y1'}]},options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{tooltip:tt},scales:{...sc('עומס'),y1:{position:'left',grid:{drawOnChartArea:false},title:{display:true,text:'אפקט',color:'rgba(235,235,245,0.4)'}}}}});
+// --- App ---
+function enterApp(){
+  document.getElementById('tab-bar').classList.add('show');
+  document.getElementById('fab').classList.add('show');
+  showTab('today');
+}
 
-// Resting HR
-const hrD=D.days.filter(d=>d.restHR>0);
-new Chart(document.getElementById('hrChart'),{type:'line',data:{labels:hrD.map(d=>short(d.d)),datasets:[{label:'דופק מנוחה',data:hrD.map(d=>d.restHR),borderColor:'#ff453a',backgroundColor:'rgba(255,69,58,0.06)',fill:true,tension:.3,pointRadius:1,pointHoverRadius:4}]},options:{responsive:true,plugins:{title:{display:true,text:'דופק מנוחה',color:'#f5f5f7',font:{size:14}},tooltip:tt},scales:sc('bpm')}});
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(name+'-screen');
+  if(el)el.classList.add('active');
+}
 
-// HRV
-const hrvV=D.hrvs.filter(h=>h.avg!=null);
-new Chart(document.getElementById('hrvChart'),{type:'line',data:{labels:hrvV.map(h=>short(h.d)),datasets:[{label:'HRV לילי',data:hrvV.map(h=>h.avg),borderColor:'#00e5ff',tension:.3,pointRadius:1,pointHoverRadius:4},{label:'Baseline עליון',data:hrvV.map(h=>h.blBal),borderColor:'rgba(48,209,88,0.3)',borderDash:[4,4],pointRadius:0,fill:false},{label:'Baseline תחתון',data:hrvV.map(h=>h.blLow),borderColor:'rgba(255,69,58,0.3)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(255,255,255,0.03)'}]},options:{responsive:true,plugins:{title:{display:true,text:'HRV',color:'#f5f5f7',font:{size:14}},tooltip:tt},scales:sc('ms')}});
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name+'-screen').classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const idx=['today','weekly','plan','settings'].indexOf(name);
+  if(idx>=0)document.querySelectorAll('.tab')[idx].classList.add('active');
+  if(name==='today')loadToday();
+  if(name==='weekly')loadWeekly();
+  if(name==='settings')loadSettings();
+}
 
-// Sleep Score
-new Chart(document.getElementById('sleepScoreChart'),{type:'line',data:{labels:D.sleeps.map(s=>short(s.d)),datasets:[{label:'ציון שינה',data:D.sleeps.map(s=>s.score||null),borderColor:'#bf5af2',backgroundColor:'rgba(191,90,242,0.06)',fill:true,tension:.3,pointRadius:1,pointHoverRadius:4,spanGaps:true}]},options:{responsive:true,plugins:{title:{display:true,text:'ציון שינה',color:'#f5f5f7',font:{size:14}},tooltip:tt},scales:{...sc('ציון'),y:{...sc('').y,min:0,max:100}}}});
+// --- Today ---
+function loadToday(){
+  const d=new Date();
+  const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  const hour=d.getHours();
+  const greet=hour<12?'בוקר טוב':hour<17?'צהריים טובים':hour<21?'ערב טוב':'לילה טוב';
+  const name=profile?.display_name||session?.user?.email?.split('@')[0]||'';
+  document.getElementById('greeting-text').textContent=greet+(name?', '+name:'')+' 👋';
+  document.getElementById('today-date').textContent='יום '+days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()];
+  loadDailySummary();
+  loadRecentActivities();
+}
 
-// Body Battery
-const bbD=D.days.filter(d=>d.bbMax>0);
-new Chart(document.getElementById('bbChart'),{type:'line',data:{labels:bbD.map(d=>short(d.d)),datasets:[{label:'מקס׳',data:bbD.map(d=>d.bbMax),borderColor:'#30d158',backgroundColor:'rgba(48,209,88,0.06)',fill:false,tension:.3,pointRadius:0,pointHoverRadius:4},{label:'מינ׳',data:bbD.map(d=>d.bbMin),borderColor:'#ff9f0a',backgroundColor:'rgba(255,159,10,0.06)',fill:'-1',tension:.3,pointRadius:0,pointHoverRadius:4}]},options:{responsive:true,plugins:{title:{display:true,text:'Body Battery',color:'#f5f5f7',font:{size:14}},tooltip:tt},scales:{...sc(''),y:{...sc('').y,min:0,max:100}}}});
+async function loadDailySummary(){
+  const today=new Date().toISOString().slice(0,10);
+  const [data,sleep]=await Promise.all([
+    sbRest('daily_summaries','user_id=eq.'+session.user.id+'&summary_date=eq.'+today+'&select=*'),
+    sbRest('sleep_logs','user_id=eq.'+session.user.id+'&sleep_date=eq.'+today+'&select=*')
+  ]);
+  let s=Array.isArray(data)&&data[0]?data[0]:{};
+  let sl=Array.isArray(sleep)&&sleep[0]?sleep[0]:{};
+  document.getElementById('m-hr').textContent=s.resting_hr||'--';
+  document.getElementById('m-stress').textContent=s.stress_avg||'--';
+  document.getElementById('m-bb').textContent=s.body_battery_max||'--';
+  document.getElementById('m-sleep').textContent=sl.total_hours?sl.total_hours.toFixed(1):'--';
+  const cal=s.calories_active||0;
+  const ex=(s.intensity_moderate_min||0)+(s.intensity_vigorous_min||0);
+  const steps=s.steps||0;
+  document.getElementById('ring-cal').textContent=cal||'--';
+  document.getElementById('ring-exercise').textContent=ex||'--';
+  document.getElementById('ring-steps').textContent=steps?steps.toLocaleString():'--';
+  drawRings(cal,ex,steps);
+}
 
-// Sleep Breakdown
-const last30=D.sleeps.slice(-30);
-new Chart(document.getElementById('sleepStack'),{type:'bar',data:{labels:last30.map(s=>short(s.d)),datasets:[{label:'עמוקה',data:last30.map(s=>s.deep),backgroundColor:'#1c1c4e',stack:'s'},{label:'קלה',data:last30.map(s=>s.light),backgroundColor:'#3a3a5c',stack:'s'},{label:'REM',data:last30.map(s=>s.rem),backgroundColor:'#bf5af2',stack:'s'},{label:'ערות',data:last30.map(s=>s.awake),backgroundColor:'rgba(255,69,58,0.5)',stack:'s'}]},options:{responsive:true,plugins:{tooltip:{...tt,callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw,1)} שעות`}}},scales:{x:{stacked:true,grid:{color:gc}},y:{stacked:true,grid:{color:gc},title:{display:true,text:'שעות',color:'rgba(235,235,245,0.4)'}}}}});
+function drawRings(cal,ex,steps){
+  const svg=document.getElementById('rings-svg');
+  const cx=75,cy=75;
+  const rings=[
+    {r:62,color:'var(--ring-move)',pct:Math.min(cal/600,1.2),w:11},
+    {r:48,color:'var(--ring-exercise)',pct:Math.min(ex/30,1.2),w:11},
+    {r:34,color:'var(--ring-stand)',pct:Math.min(steps/10000,1.2),w:11}
+  ];
+  svg.innerHTML=rings.map(({r,color,pct,w})=>{
+    const circ=2*Math.PI*r;
+    return`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-opacity="0.15" stroke-width="${w}"/>
+<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round"
+stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-Math.min(pct,1))}"
+transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>`;
+  }).join('');
+}
 
-// Records
-const longest=D.acts.reduce((b,a)=>a.dur>b.dur?a:b,D.acts[0]);
-const farthest=D.acts.reduce((b,a)=>a.dist>b.dist?a:b,D.acts[0]);
-const heaviest=D.acts.reduce((b,a)=>a.load>b.load?a:b,D.acts[0]);
-const bestSleep=D.sleeps.reduce((b,s)=>s.score>b.score?s:b,D.sleeps[0]);
-const lowestHR=daysHR.reduce((b,d)=>d.restHR<b.restHR?d:b,daysHR[0]);
-const bestHRV=hrvV.reduce((b,h)=>h.avg>b.avg?h:b,hrvV[0]);
-const maxSteps=D.days.reduce((b,d)=>d.steps>b.steps?d:b,D.days[0]);
+async function loadRecentActivities(){
+  const data=await sbRest('activities','user_id=eq.'+session.user.id+'&order=activity_date.desc&limit=5&select=*');
+  const el=document.getElementById('activities-list');
+  if(!Array.isArray(data)||!data.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🏃</div><p>אין אימונים עדיין<br>חבר את Garmin או הוסף ידנית</p><button class="empty-btn" onclick="openAddActivity()">הוסף אימון ראשון</button></div>';return}
+  el.innerHTML=data.map(a=>{
+    const icons={running:'🏃',cycling:'🚴',swimming:'🏊',gym:'🏋️',walking:'🚶',hiking:'🥾'};
+    const colors={running:'#ff375f',cycling:'#ff9f0a',swimming:'#0a84ff',gym:'#bf5af2',walking:'#30d158',hiking:'#30d158'};
+    const icon=icons[a.activity_type]||'⚡';
+    const bg=colors[a.activity_type]||'#8e8e93';
+    return`<div class="activity-card">
+<div class="act-icon" style="background:${bg}20;color:${bg}">${icon}</div>
+<div class="act-info"><div class="act-name">${a.name||a.activity_type}</div>
+<div class="act-detail">${formatDate(a.activity_date)}${a.duration_min?' · '+Math.round(a.duration_min)+' דק׳':''}</div></div>
+${a.distance_km?`<div class="act-metric"><div class="act-metric-val">${a.distance_km.toFixed(1)}</div><div class="act-metric-unit">ק״מ</div></div>`:''}</div>`;
+  }).join('');
+}
 
-document.getElementById('records').innerHTML=[
-  {v:Math.round(longest.dur)+' דק׳',l:'אימון ארוך',s:longest.n+' · '+short(longest.d)},
-  {v:fmt(farthest.dist,1)+' ק״מ',l:'מרחק רחוק',s:farthest.n+' · '+short(farthest.d)},
-  {v:fmt(heaviest.load,0),l:'עומס גבוה',s:heaviest.n+' · '+short(heaviest.d)},
-  {v:bestSleep.score,l:'שינה מושלמת',s:short(bestSleep.d)},
-  {v:lowestHR.restHR+' bpm',l:'דופק נמוך',s:short(lowestHR.d)},
-  {v:bestHRV.avg+' ms',l:'HRV גבוה',s:short(bestHRV.d)},
-  {v:fmtInt(maxSteps.steps),l:'שיא צעדים',s:short(maxSteps.d)},
-].map(r=>`<div class="rc"><div class="rv">${r.v}</div><div class="rl">${r.l}</div><div class="rs">${r.s}</div></div>`).join('');
+function formatDate(d){
+  if(!d)return'';
+  const dt=new Date(d+'T00:00:00');
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.round((today-dt)/86400000);
+  if(diff===0)return'היום';
+  if(diff===1)return'אתמול';
+  if(diff<7)return'לפני '+diff+' ימים';
+  return dt.getDate()+'/'+(dt.getMonth()+1);
+}
 
-// Activity Table
-const tbody=document.querySelector('#actTable tbody');
-D.acts.slice().reverse().forEach(a=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${short(a.d)}</td><td>${typeHe[a.t]||a.t}</td><td class="an">${a.n}</td><td>${a.dist?fmt(a.dist,1)+' ק״מ':'—'}</td><td>${Math.round(a.dur)} דק׳</td><td>${a.avgHR||'—'}</td><td>${fmt(a.load,0)}</td>`;tbody.appendChild(tr)});
+// --- Add Activity ---
+function openAddActivity(){
+  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('add-modal').classList.add('show');
+}
+function closeAddActivity(){document.getElementById('add-modal').classList.remove('show')}
+
+async function saveActivity(){
+  const body={
+    user_id:session.user.id,
+    source:'manual',
+    activity_type:document.getElementById('f-type').value,
+    name:document.getElementById('f-name').value||null,
+    activity_date:document.getElementById('f-date').value,
+    distance_km:parseFloat(document.getElementById('f-dist').value)||null,
+    duration_min:parseFloat(document.getElementById('f-dur').value)||null,
+    avg_hr:parseInt(document.getElementById('f-hr').value)||null,
+    calories:parseInt(document.getElementById('f-cal').value)||null,
+    notes:document.getElementById('f-notes').value||null
+  };
+  await sbInsert('activities',body);
+  closeAddActivity();
+  ['f-name','f-dist','f-dur','f-hr','f-cal','f-notes'].forEach(id=>document.getElementById(id).value='');
+  loadRecentActivities();
+}
+
+// --- Weekly ---
+let hrChart,sleepChart;
+async function loadWeekly(){
+  const d=new Date();
+  const dates=Array.from({length:7},(_,i)=>{const x=new Date(d);x.setDate(d.getDate()-6+i);return x.toISOString().slice(0,10)});
+  const from=dates[0],to=dates[6];
+  document.getElementById('week-range').textContent=dates[0].slice(5).replace('-','/')+' — '+dates[6].slice(5).replace('-','/');
+
+  const [dailies,sleeps,acts]=await Promise.all([
+    sbRest('daily_summaries','user_id=eq.'+session.user.id+'&summary_date=gte.'+from+'&summary_date=lte.'+to+'&order=summary_date.asc&select=*'),
+    sbRest('sleep_logs','user_id=eq.'+session.user.id+'&sleep_date=gte.'+from+'&sleep_date=lte.'+to+'&order=sleep_date.asc&select=*'),
+    sbRest('activities','user_id=eq.'+session.user.id+'&activity_date=gte.'+from+'&activity_date=lte.'+to+'&order=activity_date.desc&select=*')
+  ]);
+
+  // Week summary
+  const actArr=Array.isArray(acts)?acts:[];
+  document.getElementById('ws-count').textContent=actArr.length;
+  document.getElementById('ws-dist').textContent=actArr.reduce((s,a)=>s+(a.distance_km||0),0).toFixed(1);
+  document.getElementById('ws-time').textContent=Math.round(actArr.reduce((s,a)=>s+(a.duration_min||0),0));
+
+  const labels=dates.map(d=>{const x=new Date(d+'T00:00:00');return['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'][x.getDay()]});
+  const dMap={};if(Array.isArray(dailies))dailies.forEach(r=>dMap[r.summary_date]=r);
+  const sMap={};if(Array.isArray(sleeps))sleeps.forEach(r=>sMap[r.sleep_date]=r);
+
+  const hrData=dates.map(d=>dMap[d]?.resting_hr||null);
+  const sleepData=dates.map(d=>sMap[d]?.total_hours||null);
+
+  const cfg={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1e',titleColor:'#fff',bodyColor:'#8e8e93',borderColor:'#2c2c2e',borderWidth:1,cornerRadius:8,padding:10}},
+    scales:{x:{ticks:{color:'#636366',font:{size:11}},grid:{display:false}},
+    y:{ticks:{color:'#636366',font:{size:11}},grid:{color:'rgba(255,255,255,.04)'}}}};
+
+  if(hrChart)hrChart.destroy();
+  hrChart=new Chart(document.getElementById('chart-hr'),{type:'line',
+    data:{labels,datasets:[{data:hrData,borderColor:'#ff375f',backgroundColor:'rgba(255,55,95,.1)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#ff375f',borderWidth:2}]},options:cfg});
+
+  if(sleepChart)sleepChart.destroy();
+  sleepChart=new Chart(document.getElementById('chart-sleep'),{type:'bar',
+    data:{labels,datasets:[{data:sleepData,backgroundColor:'rgba(191,90,242,.6)',hoverBackgroundColor:'#bf5af2',borderRadius:4,borderSkipped:false}]},options:cfg});
+
+  const wEl=document.getElementById('week-activities');
+  if(!actArr.length){wEl.innerHTML='<div class="empty" style="padding:30px"><p>אין אימונים השבוע</p></div>';return}
+  wEl.innerHTML=actArr.map(a=>{
+    const icons={running:'🏃',cycling:'🚴',swimming:'🏊',gym:'🏋️',walking:'🚶',hiking:'🥾'};
+    const colors={running:'#ff375f',cycling:'#ff9f0a',swimming:'#0a84ff',gym:'#bf5af2',walking:'#30d158',hiking:'#30d158'};
+    return`<div class="activity-card">
+<div class="act-icon" style="background:${(colors[a.activity_type]||'#8e8e93')}20">${icons[a.activity_type]||'⚡'}</div>
+<div class="act-info"><div class="act-name">${a.name||a.activity_type}</div>
+<div class="act-detail">${formatDate(a.activity_date)}${a.duration_min?' · '+Math.round(a.duration_min)+' דק׳':''}</div></div>
+${a.distance_km?`<div class="act-metric"><div class="act-metric-val">${a.distance_km.toFixed(1)}</div><div class="act-metric-unit">ק״מ</div></div>`:''}</div>`;
+  }).join('');
+}
+
+// --- Plan (sample) ---
+function createSamplePlan(){
+  const sportNames={running:'ריצה',cycling:'רכיבה',swimming:'שחייה',triathlon:'טריאתלון',gym:'חדר כושר',other:'אימון'};
+  const sport=profile?.primary_sport||'running';
+  const name=sportNames[sport]||'אימון';
+  const days=['א','ב','ג','ד','ה','ו','ש'];
+  const plans=[
+    {day:0,type:name+' קלה',desc:'30 דק׳ בקצב נמוך, חימום + שחרור',done:false},
+    {day:1,type:'חדר כושר',desc:'אימון כוח - פלג גוף עליון',done:false},
+    {day:2,type:name+' אינטרוולים',desc:'5x800מ׳ עם 2 דק׳ מנוחה',done:false},
+    {day:3,type:'מנוחה פעילה',desc:'מתיחות, יוגה או הליכה 20 דק׳',done:false},
+    {day:4,type:name+' טמפו',desc:'40 דק׳ בקצב בינוני-גבוה',done:false},
+    {day:5,type:'חדר כושר',desc:'אימון כוח - פלג גוף תחתון',done:false},
+    {day:6,type:name+' ארוכה',desc:'60 דק׳ בקצב נוח',done:false}
+  ];
+  const today=new Date();
+  const el=document.getElementById('plan-content');
+  el.innerHTML='<div class="card"><div class="card-header"><div class="card-title">תוכנית שבועית</div><div class="card-action">שבוע 1</div></div></div>'+
+    plans.map(p=>{
+      const dt=new Date(today);dt.setDate(today.getDate()-today.getDay()+p.day);
+      const isToday=dt.toDateString()===today.toDateString();
+      return`<div class="plan-card" style="${isToday?'border:1px solid var(--accent);':''}">
+<div class="plan-day"><div class="plan-day-name">${days[p.day]}</div><div class="plan-day-num">${dt.getDate()}</div></div>
+<div class="plan-info"><div class="plan-type">${p.type}</div><div class="plan-desc">${p.desc}</div></div>
+<div class="plan-check${p.done?' done':''}" onclick="this.classList.toggle('done')"></div></div>`;
+    }).join('');
+}
+
+// --- Settings ---
+function loadSettings(){
+  document.getElementById('s-name').textContent=profile?.display_name||session?.user?.email?.split('@')[0]||'—';
+  const sports={running:'ריצה',cycling:'רכיבה',swimming:'שחייה',triathlon:'טריאתלון',gym:'חדר כושר',other:'אחר'};
+  document.getElementById('s-sport').textContent=sports[profile?.primary_sport]||'—';
+  document.getElementById('s-email').textContent=session?.user?.email||'—';
+  const goalNames={endurance:'סיבולת',speed:'מהירות',weight:'משקל',muscle:'שריר',health:'בריאות',race:'תחרות'};
+  const goals=profile?.goals;
+  document.getElementById('s-goals').textContent=Array.isArray(goals)&&goals.length?goals.map(g=>goalNames[g]||g).join(', '):'—';
+  const garminEl=document.getElementById('s-garmin');
+  garminEl.innerHTML=profile?.garmin_api_key_encrypted?'<span class="setting-badge on">מחובר ✓</span>':'<span class="setting-badge off">לא מחובר</span>';
+}
+
+function promptGarminKey(){
+  const key=prompt('הכנס מפתח Garmin API:');
+  if(key){sbPatch('profiles','id=eq.'+session.user.id,{garmin_api_key_encrypted:key}).then(()=>{
+    profile.garmin_api_key_encrypted=key;loadSettings();
+  })}
+}
+
+// --- Init ---
+(async function(){
+  const hash=window.location.hash;
+  if(hash&&hash.includes('access_token')){
+    const params=new URLSearchParams(hash.substring(1));
+    session={access_token:params.get('access_token'),refresh_token:params.get('refresh_token'),user:{id:'',email:''}};
+    const user=await sb('/auth/v1/user');
+    if(user.id){session.user=user;localStorage.setItem('sb_session',JSON.stringify(session));
+      window.location.hash='';onAuth();return}
+  }
+  try{const s=JSON.parse(localStorage.getItem('sb_session'));
+    if(s?.access_token){session=s;
+      const user=await sb('/auth/v1/user');
+      if(user.id){session.user=user;localStorage.setItem('sb_session',JSON.stringify(session));onAuth();return}
+      localStorage.removeItem('sb_session');
+    }
+  }catch(e){}
+  showScreen('auth');
+})();
+drawRings(0,0,0);
 </script>
 </body></html>
