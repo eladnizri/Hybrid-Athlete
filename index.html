@@ -10,13 +10,14 @@
 --card:rgba(255,255,255,.6);--bar:rgba(255,255,255,.7);--field:rgba(255,255,255,.7);--line:rgba(255,255,255,.7);
 --text:#1a1a1a;--text2:#3a403c;
 --accent:#1f5a41;--accent-light:#e8f5ee;--red:#a52626;
+--ring-hrv:#1f5a41;--ring-hr:#e8927c;--ring-steps:#c9a227;--ring-sleep:#4da6c9;
 --ring-cal:#b8355c;--ring-min:#1f5a41;--ring-km:#0b7a99;
 --radius:20px;--radius-sm:14px;--pill:50px;
 --safe-b:env(safe-area-inset-bottom,0px);
 --shadow:0 4px 24px rgba(0,0,0,.08)
 }
-@media (prefers-reduced-transparency:reduce),(prefers-contrast:more){:root{--card:#f3f6f3;--bar:#f3f6f3;--field:#fff;--line:#5c6b61}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){:root{--card:#f3f6f3;--bar:#f3f6f3;--field:#fff;--line:#5c6b61}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
 color:var(--text);min-height:100dvh;line-height:1.4;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 padding-bottom:calc(150px + var(--safe-b))}
@@ -96,10 +97,10 @@ background:var(--card);font-size:17px;font-weight:600;margin-top:10px}
 border:1px solid var(--line)}
 .tab-bar{position:fixed;bottom:calc(16px + var(--safe-b));left:50%;transform:translateX(-50%);
 display:none;border-radius:var(--pill);padding:6px;z-index:100;
-box-shadow:0 4px 24px rgba(0,0,0,.12);width:calc(100% - 32px);max-width:420px}
+box-shadow:0 4px 24px rgba(0,0,0,.12);width:calc(100% - 32px);max-width:460px}
 .tab-bar.show{display:flex}
-.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:0 4px;
-color:var(--text2);font-size:13px;font-weight:600;border:none;background:none;border-radius:var(--pill)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:4px 2px;
+color:var(--text2);font-size:11px;font-weight:600;border:none;background:none;border-radius:var(--pill)}
 .tab.active{color:var(--accent);background:#fff;font-weight:700}
 .tab svg{width:20px;height:20px;fill:currentColor;flex-shrink:0}
 .fab{position:fixed;bottom:calc(88px + var(--safe-b));left:20px;width:56px;height:56px;
@@ -117,28 +118,42 @@ padding:12px 20px calc(20px + var(--safe-b));animation:slideUp .3s ease-out}
 .modal-handle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,.2);margin:0 auto 12px}
 .modal h2{margin:0 0 16px;text-align:center}
 
-/* === TODAY === */
-.profile-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-.avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px solid #fff;flex-shrink:0}
-.profile-header h1{font-size:22px}
-.rings{display:flex;align-items:center;gap:20px;padding:20px}
-.rings svg{width:132px;height:132px;flex-shrink:0}
-.rings circle{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
-.rings-legend{display:flex;flex-direction:column;gap:12px}
-.ring-item{display:flex;align-items:center;gap:10px}
-.ring-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.ring-val{font-size:22px;font-weight:700;line-height:1.1}
-.ring-label{font-size:13px;color:var(--text2)}
+/* === HOME (בית) === */
+.home-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.home-top-right h1{font-size:24px}
+.home-top-left{display:flex;gap:8px}
+.home-top-left button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center}
+.status-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center;box-shadow:var(--shadow)}
+.status-card .status-date{font-size:14px;color:var(--text2)}
+.status-card .status-title{font-size:26px;font-weight:800;margin:8px 0 4px;color:var(--accent)}
+.status-card .status-sub{font-size:15px;color:var(--text2)}
+.status-card .status-no-data{font-size:14px;color:var(--text2);padding:8px 0}
 
-/* today planned workout card */
-.today-plan{display:flex;align-items:center;gap:14px;padding:16px;cursor:pointer}
-.today-plan .icon{width:28px;height:28px;color:var(--accent)}
-.today-plan-info{flex:1}
-.today-plan-title{font-size:17px;font-weight:700}
-.today-plan-desc{font-size:14px;color:var(--text2);margin-top:2px}
-.today-plan .btn{width:auto;padding:8px 20px;margin:0;min-height:40px;font-size:15px}
+.health-gauges{display:flex;justify-content:space-around;padding:16px 8px;margin-bottom:4px}
+.gauge{display:flex;flex-direction:column;align-items:center;gap:6px}
+.gauge svg{width:76px;height:76px}
+.gauge-label{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);font-weight:600}
+.gauge-label .icon{width:14px;height:14px}
 
+.today-workout{display:flex;align-items:center;gap:14px;padding:16px;cursor:pointer}
+.today-workout .tw-icon{width:48px;height:48px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.today-workout .tw-icon .icon{width:24px;height:24px;color:var(--accent)}
+.today-workout .tw-info{flex:1}
+.today-workout .tw-label{font-size:13px;color:var(--text2)}
+.today-workout .tw-name{font-size:18px;font-weight:700}
+.today-workout .tw-desc{font-size:14px;color:var(--text2);margin-top:2px}
+.tw-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tw-chip{font-size:13px;padding:4px 12px;border-radius:var(--pill);border:1px solid var(--line);background:rgba(255,255,255,.5);font-weight:600}
+
+.status-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--accent);border-radius:var(--pill);margin-bottom:12px;font-size:14px;font-weight:600;color:var(--accent)}
+.status-banner .icon{color:var(--accent);flex-shrink:0}
+
+.weekly-summary{padding:16px}
+.weekly-summary h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.weekly-summary .ws-sub{font-size:13px;color:var(--text2);margin-bottom:8px}
+.weekly-summary p{font-size:14px;line-height:1.6;color:var(--text2)}
+
+/* === WORKOUTS (אימונים) === */
 .activity-card,.plan-card{padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
 .act-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
 .act-icon .icon{width:22px;height:22px;color:var(--accent)}
@@ -152,19 +167,6 @@ font-size:24px;font-weight:700;color:#fff;background:var(--accent);border:2px so
 .empty-icon{margin-bottom:8px}
 .empty .btn{width:auto;padding:12px 28px}
 
-/* === WEEKLY === */
-.stat{border-radius:var(--radius-sm);padding:12px;text-align:center}
-.stat b{font-size:24px;display:block}
-.stat span{font-size:13px;color:var(--text2)}
-.bars{display:flex;align-items:flex-end;gap:8px;height:140px}
-.bar-col{flex:1;text-align:center;font-size:12px;color:var(--text2)}
-.bar{background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px;margin:4px 0;opacity:.85}
-.bar-col.today{color:var(--text);font-weight:700}
-
-/* === PLAN === */
-.plan-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
-.plan-tab{min-height:44px;padding:8px 18px;border-radius:var(--pill);border:2px solid var(--line);background:var(--card);font-size:15px;font-weight:600;white-space:nowrap}
-.plan-tab.sel{border-color:var(--accent);background:#fff;color:var(--accent)}
 .plan-day{width:44px;text-align:center;flex-shrink:0}
 .plan-day span{font-size:12px;color:var(--text2);font-weight:600;display:block}
 .plan-day b{font-size:22px}
@@ -185,6 +187,44 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 .sets-grid .input{min-height:40px;padding:8px 10px;font-size:15px;text-align:center}
 .add-exercise-btn{min-height:44px;padding:8px 16px;border:2px dashed var(--line);border-radius:var(--radius-sm);background:none;font-size:14px;font-weight:600;color:var(--text2);width:100%;margin-top:4px}
 
+/* === SLEEP === */
+.sleep-hero{text-align:center;padding:20px 16px}
+.sleep-hero .sh-val{font-size:48px;font-weight:800;color:var(--accent)}
+.sleep-hero .sh-label{font-size:15px;color:var(--text2);margin-top:4px}
+.sleep-quality{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0}
+.sleep-quality .sq-score{font-size:20px;font-weight:700}
+.sleep-quality .sq-label{font-size:14px;color:var(--text2)}
+.sleep-stages{display:flex;height:24px;border-radius:12px;overflow:hidden;margin:12px 0}
+.sleep-stages div{height:100%;min-width:2px}
+.sleep-stages-legend{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-top:8px}
+.sleep-stages-legend span{display:flex;align-items:center;gap:4px}
+.sleep-stages-legend span::before{content:'';width:10px;height:10px;border-radius:50%;display:inline-block}
+.ss-deep::before{background:#1a3a6b!important}
+.ss-light::before{background:#5b9bd5!important}
+.ss-rem::before{background:#9b59b6!important}
+.ss-awake::before{background:#e0e0e0!important}
+
+/* === HEART === */
+.heart-big{text-align:center;padding:16px}
+.heart-big .hb-val{font-size:48px;font-weight:800}
+.heart-big .hb-unit{font-size:16px;color:var(--text2);font-weight:600}
+.heart-big .hb-label{font-size:14px;color:var(--text2);margin-top:4px}
+
+/* === ACTIVITY === */
+.activity-big{text-align:center;padding:16px}
+.activity-big .ab-val{font-size:48px;font-weight:800;color:var(--accent)}
+.activity-big .ab-label{font-size:14px;color:var(--text2);margin-top:4px}
+
+/* shared stat/bar */
+.stat{border-radius:var(--radius-sm);padding:12px;text-align:center;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.stat b{font-size:24px;display:block}
+.stat span{font-size:13px;color:var(--text2)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:100px}
+.bar-col{flex:1;text-align:center;font-size:11px;color:var(--text2)}
+.bar{border-radius:6px 6px 2px 2px;min-height:3px;margin:4px 0;opacity:.85}
+.bar-col.today .bar{opacity:1}
+.bar-col.today{color:var(--text);font-weight:700}
+
 /* === WORKOUT MODE === */
 .workout-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;flex-direction:column;overflow:hidden}
 .workout-overlay.show{display:flex}
@@ -198,7 +238,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 .wo-dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,.15)}
 .wo-dot.active{background:var(--accent)}
 .wo-dot.completed{background:var(--accent);opacity:.5}
-.wo-carousel{flex:1;overflow:hidden;position:relative}
+.wo-carousel{flex:1;overflow:hidden;position:relative;touch-action:pan-y}
 .wo-slides{display:flex;transition:transform .3s ease-out;height:100%}
 .wo-slide{min-width:100%;padding:0 16px;overflow-y:auto}
 .wo-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
@@ -229,6 +269,9 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 
 .wo-card-actions{display:flex;justify-content:center;gap:16px;padding:12px 0;border-top:1px solid rgba(0,0,0,.08);margin-top:12px}
 .wo-card-actions button{background:none;border:none;font-size:13px;color:var(--text2);font-weight:600;min-height:44px;padding:8px 12px}
+.wo-replace-input{display:flex;gap:6px;align-items:center;padding:8px 0}
+.wo-replace-input .input{flex:1;min-height:40px;font-size:14px}
+.wo-replace-input button{min-height:40px;padding:0 12px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600}
 .wo-footer{padding:16px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
 .wo-footer textarea{width:100%;min-height:44px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--field);font-size:15px;resize:none}
 .wo-footer-btns{display:flex;gap:8px}
@@ -265,6 +308,12 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <symbol id="i-person" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
 <symbol id="i-today" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
 <symbol id="i-target" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><circle cx="12" cy="12" r="5"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12.43 2.3c-2.38-.59-4.68-.27-6.63.64C8.16 5.1 9.6 8.37 9.6 12c0 3.64-1.44 6.9-3.8 9.06 1.95.91 4.25 1.23 6.63.64C16.56 20.55 19.5 16.66 19.5 12s-2.94-8.55-7.07-9.7z"/></symbol>
+<symbol id="i-steps" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2V13h2v-2.4l1.8-.7"/></symbol>
 </svg>
 
 <!-- SETUP (first launch + edit) -->
@@ -276,7 +325,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <path d="M38 50l-6 10M62 50l6 10" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
 </svg>
 <h1 id="setup-title">Hybrid Athlete</h1>
-<p class="sub" id="setup-sub">יומן אימונים אישי</p>
+<p class="sub" id="setup-sub">יומן אימונים ובריאות</p>
 <form class="setup-form" onsubmit="event.preventDefault();saveSetup()" novalidate>
 <div class="field">
 <label for="s-input-name">שם</label>
@@ -318,10 +367,10 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <details class="api-section" id="api-section">
 <summary><svg class="icon"><use href="#i-key"/></svg> חיבור API חיצוני (לא חובה) <svg class="icon chevron" style="margin-right:auto"><use href="#i-chevron"/></svg></summary>
 <div class="api-guide">
-<p style="font-size:14px;color:var(--text2);margin-bottom:12px">חיבור ל-API חיצוני מאפשר סנכרון אוטומטי של נתוני אימונים. בצע את השלבים הבאים:</p>
-<div class="api-step"><div class="api-step-num">1</div><div class="api-step-text">היכנס לאתר השירות (למשל Garmin Connect, Strava, או כל ספק אחר) ונווט להגדרות החשבון שלך.</div></div>
-<div class="api-step"><div class="api-step-num">2</div><div class="api-step-text">חפש את סעיף "API" או "Developer" או "Apps" והפעל גישת API. חלק מהשירותים דורשים רישום אפליקציה.</div></div>
-<div class="api-step"><div class="api-step-num">3</div><div class="api-step-text">העתק את מפתח ה-API (API Key) שנוצר. <strong>שים לב:</strong> המפתח נשמר במכשיר הזה בלבד ולא נשלח לשום מקום.</div></div>
+<p style="font-size:14px;color:var(--text2);margin-bottom:12px">חיבור ל-API חיצוני מאפשר סנכרון אוטומטי של נתוני אימונים ובריאות. בצע את השלבים הבאים:</p>
+<div class="api-step"><div class="api-step-num">1</div><div class="api-step-text">היכנס לאתר השירות (למשל Garmin Connect) ונווט להגדרות החשבון שלך.</div></div>
+<div class="api-step"><div class="api-step-num">2</div><div class="api-step-text">חפש את סעיף "API" או "Developer" והפעל גישת API.</div></div>
+<div class="api-step"><div class="api-step-num">3</div><div class="api-step-text">העתק את מפתח ה-API. <strong>שים לב:</strong> המפתח נשמר במכשיר הזה בלבד.</div></div>
 <div class="api-step"><div class="api-step-num">4</div><div class="api-step-text">הדבק את המפתח בשדה למטה ולחץ ״שמור״.</div></div>
 <div class="field" style="margin-bottom:0">
 <label for="s-api-key">מפתח API</label>
@@ -340,53 +389,62 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 </form>
 </main>
 
-<!-- TODAY -->
-<main id="today-screen" class="screen">
-<div class="profile-header">
-<div class="avatar" id="user-avatar" aria-hidden="true"></div>
-<div><h1 id="greeting-text"></h1><p class="sub" id="today-date"></p></div>
-</div>
-<div class="card rings">
-<svg viewBox="0 0 140 140" id="rings-svg" role="img" aria-label="התקדמות יומית"></svg>
-<div class="rings-legend">
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-cal)"></div>
-<div><div class="ring-val" id="ring-cal">0</div><div class="ring-label">קלוריות מתוך 600</div></div></div>
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-min)"></div>
-<div><div class="ring-val" id="ring-min">0</div><div class="ring-label">דקות אימון מתוך 30</div></div></div>
-<div class="ring-item"><div class="ring-dot" style="background:var(--ring-km)"></div>
-<div><div class="ring-val" id="ring-km">0</div><div class="ring-label">ק״מ מתוך 5</div></div></div>
+<!-- HOME (בית) -->
+<main id="home-screen" class="screen">
+<div class="home-top">
+<div class="home-top-right"><h1>בית</h1><p class="sub">תמונת מצב</p></div>
+<div class="home-top-left">
+<button onclick="syncGarmin()" aria-label="סנכרון"><svg class="icon"><use href="#i-sync"/></svg></button>
+<button onclick="show('settings')" aria-label="פרופיל"><svg class="icon"><use href="#i-person"/></svg></button>
 </div>
 </div>
-<div id="today-plan-card"></div>
+<div class="status-card" id="status-card">
+<div class="status-date" id="home-date"></div>
+<div class="status-title" id="home-status-title"></div>
+<div class="status-sub" id="home-status-sub"></div>
+</div>
+<div class="card">
+<div class="card-title">מדדים</div>
+<div class="health-gauges" id="health-gauges"></div>
+</div>
+<div id="home-workout-card"></div>
+<div id="home-status-banner"></div>
+<div class="card weekly-summary" id="home-weekly-summary"></div>
+<div class="card" id="sync-progress" hidden><p id="sync-msg" style="text-align:center"></p></div>
+</main>
+
+<!-- WORKOUTS (אימונים) -->
+<main id="workouts-screen" class="screen">
+<div class="head"><h1>אימונים</h1><p class="sub" id="plan-sub">תוכנית ואימונים אחרונים</p></div>
+<div id="plan-content"></div>
 <h2>אימונים אחרונים</h2>
 <div id="activities-list"></div>
 </main>
 
-<!-- WEEKLY -->
-<main id="weekly-screen" class="screen">
-<div class="head"><h1>סיכום שבועי</h1><p class="sub" id="week-range"></p></div>
-<div class="row3" style="margin-bottom:12px">
-<div class="stat"><b id="ws-count">0</b><span>אימונים</span></div>
-<div class="stat"><b id="ws-dist">0</b><span>ק״מ</span></div>
-<div class="stat"><b id="ws-time">0</b><span>דקות</span></div>
-</div>
-<div class="card"><div class="card-title">דקות אימון ביום</div><div class="bars" id="week-bars"></div></div>
-<h2>אימונים השבוע</h2>
-<div id="week-activities"></div>
+<!-- SLEEP (שינה) -->
+<main id="sleep-screen" class="screen">
+<div class="head"><h1>שינה</h1><p class="sub">נתוני שינה מ-Garmin</p></div>
+<div id="sleep-content"></div>
 </main>
 
-<!-- PLAN -->
-<main id="plan-screen" class="screen">
-<div class="head"><h1>תוכנית אימונים</h1><p class="sub" id="plan-sub">תכנן את האימונים שלך לשבוע</p></div>
-<div id="plan-content"></div>
+<!-- HEART (לב) -->
+<main id="heart-screen" class="screen">
+<div class="head"><h1>לב</h1><p class="sub">דופק, HRV ומתח</p></div>
+<div id="heart-content"></div>
 </main>
 
-<!-- PROFILE -->
+<!-- ACTIVITY (פעילות) -->
+<main id="activity-screen" class="screen">
+<div class="head"><h1>פעילות</h1><p class="sub">צעדים, קלוריות ופעילות יומית</p></div>
+<div id="activity-content"></div>
+</main>
+
+<!-- PROFILE (פרופיל) -->
 <main id="settings-screen" class="screen">
 <div class="head"><h1>פרופיל</h1></div>
 <div class="card">
 <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-<div class="avatar" id="settings-avatar" style="width:60px;height:60px;font-size:28px" aria-hidden="true"></div>
+<div class="avatar" id="settings-avatar" style="width:60px;height:60px;font-size:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--accent);border:2px solid #fff;flex-shrink:0" aria-hidden="true"></div>
 <div><div style="font-size:20px;font-weight:700" id="s-name"></div><div class="sub" id="s-sport-label"></div></div>
 </div>
 <div class="row3">
@@ -396,16 +454,16 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 </div>
 <div class="goals-row"><span>יעדים</span><span id="s-goals"></span></div>
 <div class="goals-row"><span>API</span><span id="s-api-status"></span></div>
+<div class="goals-row"><span>סנכרון אחרון</span><span id="s-last-sync"></span></div>
 </div>
 <button class="btn" onclick="openEdit()">עריכת פרטים</button>
-<button class="btn" id="sync-btn" onclick="syncGarmin()" hidden><svg class="icon" style="vertical-align:-3px"><use href="#i-bolt"/></svg> סנכרן מ-Garmin</button>
-<div class="card" id="sync-progress" hidden><p id="sync-msg" style="text-align:center"></p></div>
+<button class="btn" onclick="syncGarmin()"><svg class="icon" style="vertical-align:-3px"><use href="#i-sync"/></svg> סנכרן מ-Garmin</button>
 <button class="btn danger" id="reset-btn" onclick="askReset(true)">איפוס נתונים</button>
 <div class="card" id="reset-confirm" style="margin-top:12px" hidden>
 <p>כל האימונים והפרטים יימחקו מהמכשיר הזה. אי אפשר לשחזר אותם.</p>
 <div class="row"><button class="btn" onclick="askReset(false)">ביטול</button><button class="btn danger" onclick="resetApp()">מחק הכול</button></div>
 </div>
-<p class="note">Hybrid Athlete v2.0 · הנתונים נשמרים במכשיר הזה בלבד</p>
+<p class="note">Hybrid Athlete v3.0 · הנתונים נשמרים במכשיר הזה בלבד</p>
 </main>
 
 <button class="fab" id="fab" onclick="openAddActivity()" aria-label="הוסף אימון"><svg class="icon icon-lg" style="fill:#fff"><use href="#i-plus"/></svg></button>
@@ -418,13 +476,8 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div class="row">
 <div class="field"><label for="f-type">סוג</label>
 <select class="input" id="f-type">
-<option value="running">ריצה</option>
-<option value="cycling">רכיבה</option>
-<option value="swimming">שחייה</option>
-<option value="gym">חדר כושר</option>
-<option value="walking">הליכה</option>
-<option value="hiking">טיול</option>
-<option value="other">אחר</option>
+<option value="running">ריצה</option><option value="cycling">רכיבה</option><option value="swimming">שחייה</option>
+<option value="gym">חדר כושר</option><option value="walking">הליכה</option><option value="hiking">טיול</option><option value="other">אחר</option>
 </select></div>
 <div class="field"><label for="f-date">תאריך</label><input class="input" type="date" id="f-date"></div>
 </div>
@@ -461,7 +514,7 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 </div>
 <div class="wo-progress"><div class="wo-progress-fill" id="wo-progress-fill"></div></div>
 <div class="wo-dots" id="wo-dots"></div>
-<div class="wo-carousel"><div class="wo-slides" id="wo-slides"></div></div>
+<div class="wo-carousel" id="wo-carousel"><div class="wo-slides" id="wo-slides"></div></div>
 <div class="wo-footer">
 <textarea id="wo-note" placeholder="הערה לאימון (אופציונלי)" rows="1"></textarea>
 <div class="wo-footer-btns">
@@ -474,14 +527,16 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button id="toast-undo" hidden>בטל</button></div>
 
 <nav class="tab-bar" id="tab-bar" aria-label="ניווט ראשי">
-<button class="tab" data-tab="today" onclick="show('today')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-today"/></svg>היום</button>
-<button class="tab" data-tab="weekly" onclick="show('weekly')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>שבועי</button>
-<button class="tab" data-tab="plan" onclick="show('plan')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plan"/></svg>תוכנית</button>
-<button class="tab" data-tab="settings" onclick="show('settings')">
-<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-person"/></svg>פרופיל</button>
+<button class="tab" data-tab="home" onclick="show('home')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg>בית</button>
+<button class="tab" data-tab="workouts" onclick="show('workouts')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gym"/></svg>אימונים</button>
+<button class="tab" data-tab="sleep" onclick="show('sleep')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg>שינה</button>
+<button class="tab" data-tab="heart" onclick="show('heart')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg>לב</button>
+<button class="tab" data-tab="activity" onclick="show('activity')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-activity"/></svg>פעילות</button>
 </nav>
 
 <script>
@@ -504,14 +559,14 @@ function iconHtml(ref,cls){return `<svg class="icon ${cls||''}" aria-hidden="tru
 // --- Navigation ---
 function show(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===name+'-screen'));
-  $('tab-bar').classList.toggle('show',name!=='welcome');
-  $('fab').classList.toggle('show',name==='today'||name==='weekly');
+  $('tab-bar').classList.toggle('show',name!=='welcome'&&name!=='settings');
+  $('fab').classList.toggle('show',name==='workouts'||name==='activity');
   document.querySelectorAll('.tab').forEach(t=>{
     const on=t.dataset.tab===name;
     t.classList.toggle('active',on);
     on?t.setAttribute('aria-current','page'):t.removeAttribute('aria-current');
   });
-  ({today:loadToday,weekly:loadWeekly,plan:renderPlan,settings:loadSettings})[name]?.();
+  ({home:loadHome,workouts:loadWorkouts,sleep:loadSleep,heart:loadHeart,activity:loadActivity,settings:loadSettings})[name]?.();
   scrollTo(0,0);
 }
 
@@ -563,7 +618,7 @@ function saveSetup(){
   const editing=!!profile;
   profile={name,age:num('age'),height:num('height'),weight:num('weight'),sport:obSport||'other',goals:obGoals};
   store.set('ha_profile',profile);
-  show(editing?'settings':'today');
+  show(editing?'settings':'home');
   if(editing)toast('הפרטים נשמרו');
 }
 function saveApiKey(){
@@ -575,50 +630,145 @@ function saveApiKey(){
   st.textContent='המפתח נשמר במכשיר';st.className='api-status ok';
 }
 
-// --- Today ---
-function loadToday(){
+// --- HOME (בית) ---
+function loadHome(){
   const d=new Date(),h=d.getHours();
   const greet=h>=5&&h<12?'בוקר טוב':h>=12&&h<17?'צהריים טובים':'ערב טוב';
-  $('greeting-text').textContent=greet+', '+profile.name;
-  $('today-date').textContent=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
-  $('user-avatar').textContent=profile.name[0].toUpperCase();
-  const all=acts(),today=all.filter(a=>a.date===ymd(d));
-  const sum=k=>today.reduce((s,a)=>s+(a[k]||0),0);
-  const cal=sum('calories'),min=sum('duration'),km=sum('distance');
-  $('ring-cal').textContent=Math.round(cal);
-  $('ring-min').textContent=Math.round(min);
-  $('ring-km').textContent=km.toFixed(1);
-  drawRings([[58,'cal',cal/600],[45,'min',min/30],[32,'km',km/5]]);
-  renderTodayPlan();
-  $('activities-list').innerHTML=listHtml(all.slice(0,5),
-    `<div class="empty-icon">${iconHtml('#i-run','icon-lg')}</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>`);
-}
-function drawRings(rings){
-  $('rings-svg').innerHTML=rings.map(([r,name,pct])=>{
-    const c=2*Math.PI*r,s=`cx="70" cy="70" r="${r}" style="stroke:var(--ring-${name})"`;
-    return`<circle ${s} stroke-opacity=".15"/><circle ${s} stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(pct,1))}" transform="rotate(-90 70 70)"/>`;
+  $('home-date').textContent=greet+' · '+d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'});
+
+  // Health data
+  const summaries=store.get('ha_daily_summaries',[]);
+  const sleepData=store.get('ha_sleep',[]);
+  const hrvData=store.get('ha_hrv',[]);
+  const today=ymd(d);
+  const todaySummary=summaries.find(s=>s.date===today)||summaries[summaries.length-1]||null;
+  const lastSleep=sleepData.length?sleepData[sleepData.length-1]:null;
+  const lastHrv=hrvData.length?hrvData[hrvData.length-1]:null;
+
+  const hasHealthData=todaySummary||lastSleep||lastHrv;
+
+  // Body status
+  if(hasHealthData){
+    const status=computeBodyStatus(todaySummary,lastSleep,lastHrv);
+    $('home-status-title').textContent=status.title;
+    $('home-status-sub').textContent=status.sub;
+    $('home-status-title').style.color='var(--accent)';
+  } else {
+    $('home-status-title').textContent='סנכרן נתוני בריאות';
+    $('home-status-sub').textContent='לחץ על כפתור הסנכרון לתמונת מצב מלאה';
+    $('home-status-title').style.color='var(--text2)';
+  }
+
+  // Health gauges
+  const hrv=lastHrv?.lastNight||lastHrv?.weeklyAvg||0;
+  const rhr=todaySummary?.restingHeartRate||0;
+  const steps=todaySummary?.steps||0;
+  const sleepHrs=lastSleep?.duration?Math.round(lastSleep.duration/60*10)/10:0;
+
+  $('health-gauges').innerHTML=[
+    {val:sleepHrs,unit:'ש׳',label:'שינה',icon:'#i-moon',color:'var(--ring-sleep)',max:10,fmt:v=>v.toFixed(1)},
+    {val:steps,unit:'',label:'צעדים',icon:'#i-steps',color:'var(--ring-steps)',max:10000,fmt:v=>v>=1000?(v/1000).toFixed(1)+'k':v},
+    {val:rhr,unit:'bpm',label:'דופק',icon:'#i-heart',color:'var(--ring-hr)',max:100,fmt:v=>v},
+    {val:hrv,unit:'ms',label:'HRV',icon:'#i-heart',color:'var(--ring-hrv)',max:120,fmt:v=>v},
+  ].map(g=>{
+    const pct=g.max?Math.min(g.val/g.max,1):0;
+    const r=30,c=2*Math.PI*r;
+    return`<div class="gauge">
+<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${r}" fill="none" stroke="${g.color}" stroke-opacity=".15" stroke-width="7"/>
+<circle cx="40" cy="40" r="${r}" fill="none" stroke="${g.color}" stroke-width="7" stroke-linecap="round"
+stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" transform="rotate(-90 40 40)"/>
+<text x="40" y="37" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text)">${g.fmt(g.val)}</text>
+<text x="40" y="50" text-anchor="middle" font-size="10" fill="var(--text2)">${g.unit}</text>
+</svg>
+<div class="gauge-label">${iconHtml(g.icon)} ${g.label}</div>
+</div>`;
   }).join('');
+
+  // Today's workout
+  renderHomePlan();
+
+  // Status banner
+  if(hasHealthData){
+    $('home-status-banner').innerHTML=`<div class="status-banner">${iconHtml('#i-check')} כל המדדים בטווח הרגיל שלך בימים האחרונים.</div>`;
+  } else {
+    $('home-status-banner').innerHTML='';
+  }
+
+  // Weekly summary
+  renderWeeklySummary();
 }
 
-function renderTodayPlan(){
+function computeBodyStatus(summary,sleep,hrv){
+  let score=0,factors=0;
+  if(sleep?.quality){score+=sleep.quality;factors++}
+  if(hrv?.lastNight){
+    const avg=hrv.weeklyAvg||hrv.lastNight;
+    score+=hrv.lastNight>=avg*0.9?80:60;
+    factors++;
+  }
+  if(summary?.bodyBattery){score+=summary.bodyBattery;factors++}
+  if(summary?.stressLevel){score+=Math.max(0,100-summary.stressLevel);factors++}
+  const avg=factors?Math.round(score/factors):70;
+  if(avg>=80)return{title:'מצוין – הגוף מאושש',sub:'קדימה, יום מוצלח'};
+  if(avg>=60)return{title:'טוב – מוכנות סבירה',sub:'אפשר להתאמן, תקשיב לגוף'};
+  return{title:'כדאי לנוח',sub:'הגוף צריך התאוששות'};
+}
+
+function renderHomePlan(){
   const plan=store.get('ha_plan',null);
   const dayIdx=new Date().getDay();
   if(!plan||!plan.sessions){
-    $('today-plan-card').innerHTML='';return;
+    $('home-workout-card').innerHTML='';return;
   }
   const session=plan.sessions[dayIdx];
   if(!session){
-    $('today-plan-card').innerHTML=`<div class="card today-plan">${iconHtml('#i-rest','icon-lg')}<div class="today-plan-info"><div class="today-plan-title">יום מנוחה</div><div class="today-plan-desc">אין אימון מתוכנן להיום</div></div></div>`;
+    $('home-workout-card').innerHTML=`<div class="card today-workout">${iconHtml('#i-rest','icon-lg')}<div class="tw-info"><div class="tw-label">היום</div><div class="tw-name">יום מנוחה</div><div class="tw-desc">אין אימון מתוכנן</div></div></div>`;
     return;
   }
   const isStrength=session.type==='strength';
   const desc=isStrength?(session.exercises||[]).length+' תרגילים':sessionDesc(session);
-  $('today-plan-card').innerHTML=`<div class="card today-plan" onclick="${isStrength?`startWorkout(${dayIdx})`:'openAddActivity()'}">
-${iconHtml(isStrength?'#i-gym':(session.type==='cycling'?'#i-bike':'#i-run'),'icon-lg')}
-<div class="today-plan-info"><div class="today-plan-title">${esc(session.name||TYPES[session.type]?.[1]||'אימון')}</div>
-<div class="today-plan-desc">${esc(desc)}</div></div>
-${isStrength?'<button class="btn primary" onclick="event.stopPropagation();startWorkout('+dayIdx+')">התחל אימון</button>':''}
-</div>`;
+  const typeIcon=isStrength?'#i-gym':(session.type==='cycling'?'#i-bike':'#i-run');
+  const typeName=isStrength?'אימון כוח':(TYPES[session.type]?.[1]||'אימון');
+  // count how many of this type done this week
+  const doneCnt=(plan.done||[]).filter(i=>{const s=plan.sessions[i];return s&&s.type===session.type}).length;
+  const totalType=plan.sessions.filter(s=>s&&s.type===session.type).length;
+  $('home-workout-card').innerHTML=`<div class="card today-workout" onclick="${isStrength?`startWorkout(${dayIdx})`:'openAddActivity()'}">
+<div class="tw-icon">${iconHtml(typeIcon)}</div>
+<div class="tw-info"><div class="tw-label">היום</div><div class="tw-name">${esc(session.name||typeName)}</div>
+<div class="tw-desc">${esc(desc)}</div>
+<div class="tw-chips"><span class="tw-chip">${doneCnt}/${totalType} ${esc(typeName)} השבוע</span></div>
+</div></div>`;
+}
+
+function renderWeeklySummary(){
+  const all=acts();
+  const d=new Date();
+  const weekAgo=ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()-6));
+  const twoWeeksAgo=ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()-13));
+  const thisWeek=all.filter(a=>a.date>=weekAgo);
+  const lastWeek=all.filter(a=>a.date>=twoWeeksAgo&&a.date<weekAgo);
+  const tw=thisWeek.length,lw=lastWeek.length;
+  const twMin=Math.round(thisWeek.reduce((s,a)=>s+(a.duration||0),0));
+  const lwMin=Math.round(lastWeek.reduce((s,a)=>s+(a.duration||0),0));
+  let txt='';
+  if(tw>0||lw>0){
+    txt=`${tw} אימונים, ${twMin} דקות השבוע`;
+    if(lw>0){
+      const diff=tw-lw;
+      txt+=diff>0?` (${diff}+ מהשבוע הקודם)`:diff<0?` (${Math.abs(diff)}- מהשבוע הקודם)`:' (כמו השבוע הקודם)';
+    }
+  } else {
+    txt='עוד לא נרשמו אימונים השבוע';
+  }
+  $('home-weekly-summary').innerHTML=`<h3>הסיכום השבועי שלך</h3><div class="ws-sub">מול השבוע הקודם</div><p>${esc(txt)}</p>`;
+}
+
+// --- WORKOUTS (אימונים) ---
+function loadWorkouts(){
+  renderPlan();
+  const all=acts();
+  $('activities-list').innerHTML=listHtml(all.slice(0,10),
+    `<div class="empty-icon">${iconHtml('#i-run','icon-lg')}</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>`);
 }
 
 function sessionDesc(s){
@@ -668,22 +818,7 @@ function saveActivity(){
   refresh();
   toast('האימון נשמר',()=>{store.set('ha_activities',acts().filter(a=>a.id!==act.id));refresh()});
 }
-function refresh(){loadToday();loadWeekly()}
-
-// --- Weekly ---
-function loadWeekly(){
-  const days=Array.from({length:7},(_,i)=>{const x=new Date();x.setDate(x.getDate()-6+i);return x});
-  const keys=days.map(ymd),week=acts().filter(a=>a.date>=keys[0]&&a.date<=keys[6]);
-  const fmt=d=>d.getDate()+'/'+(d.getMonth()+1);
-  $('week-range').textContent=fmt(days[0])+' – '+fmt(days[6]);
-  $('ws-count').textContent=week.length;
-  $('ws-dist').textContent=week.reduce((s,a)=>s+(a.distance||0),0).toFixed(1);
-  $('ws-time').textContent=Math.round(week.reduce((s,a)=>s+(a.duration||0),0));
-  const mins=keys.map(k=>Math.round(week.filter(a=>a.date===k).reduce((s,a)=>s+(a.duration||0),0)));
-  const max=Math.max(...mins,1);
-  $('week-bars').innerHTML=mins.map((m,i)=>`<div class="bar-col${i===6?' today':''}">${m||''}<div class="bar" style="height:${Math.round(m/max*90)}px"></div>${DAYS[days[i].getDay()]}</div>`).join('');
-  $('week-activities').innerHTML=listHtml(week,`<p>עוד לא נרשמו אימונים ב-7 הימים האחרונים</p>`);
-}
+function refresh(){loadHome();loadWorkouts()}
 
 // --- Plan ---
 function weekStart(){const s=new Date();s.setDate(s.getDate()-s.getDay());return s}
@@ -692,7 +827,11 @@ function renderPlan(){
   const start=weekStart(),key=ymd(start);
   let plan=store.get('ha_plan',null);
   if(!plan||!plan.sessions){
-    $('plan-content').innerHTML=`<div class="empty"><div class="empty-icon">${iconHtml('#i-plan','icon-lg')}</div><p>תכנן את שבוע האימונים שלך: סיבולת, כוח ומנוחה</p><button class="btn primary" onclick="createPlan()">צור תוכנית שבועית</button></div>`;
+    // Custom plan creation: show 7 empty slots
+    $('plan-content').innerHTML=`<div class="card" style="padding:20px;text-align:center">
+<p style="font-size:15px;color:var(--text2);margin-bottom:12px">צור תוכנית אימונים שבועית מותאמת אישית</p>
+<button class="btn primary" onclick="createEmptyPlan()">צור תוכנית שבועית</button>
+</div>`;
     return;
   }
   if(plan.week!==key){plan={...plan,week:key,done:[]};store.set('ha_plan',plan)}
@@ -705,7 +844,7 @@ function renderPlan(){
     const done=(plan.done||[]).includes(i);
     const isRest=!session;
     const name=isRest?'מנוחה':session.name||(session.type==='strength'?'אימון כוח':(TYPES[session.type]||TYPES.other)[1]);
-    const desc=isRest?'יום מנוחה פעילה':session.type==='strength'?(session.exercises||[]).length+' תרגילים':sessionDesc(session);
+    const desc=isRest?'יום מנוחה':session.type==='strength'?(session.exercises||[]).length+' תרגילים':sessionDesc(session);
     const isStrength=session&&session.type==='strength';
     return`<div class="plan-card${i===today?' today':''}${done?' done':''}" ${isStrength&&!done?`onclick="startWorkout(${i})" style="cursor:pointer"`:''}>
 <div class="plan-day"><span>${i===today?'היום':DAYS[i]}</span><b>${dt.getDate()}</b></div>
@@ -713,33 +852,19 @@ function renderPlan(){
 ${!isRest?`<button class="plan-check" aria-pressed="${done}" aria-label="סמן כהושלם: ${esc(name)}" onclick="event.stopPropagation();togglePlan(${i})"></button>`:''}
 <button style="background:none;border:none;padding:8px;min-height:44px" onclick="event.stopPropagation();editPlanDay(${i})" aria-label="ערוך">${iconHtml('#i-plan')}</button>
 </div>`;
-  }).join('');
+  }).join('')+`<button class="btn" style="margin-top:8px" onclick="deletePlan()">מחק תוכנית</button>`;
 }
 
-function createPlan(){
-  const s={running:'ריצה',cycling:'רכיבה',swimming:'שחייה'}[profile.sport]||'ריצה';
-  const base=profile.sport==='cycling'?'cycling':profile.sport==='swimming'?'swimming':'running';
-  const sessions=[
-    {type:base,name:s+' קלה',duration:30,distance:null,pace:null,zone:2},
-    {type:'strength',name:'כוח: פלג גוף עליון',exercises:[
-      {name:'לחיצת חזה',sets:3,reps:10,weight:0,muscles:['חזה','כתפיים']},
-      {name:'חתירה',sets:3,reps:10,weight:0,muscles:['גב','זרועות']},
-      {name:'לחיצת כתפיים',sets:3,reps:10,weight:0,muscles:['כתפיים']},
-      {name:'כפיפות מרפק',sets:3,reps:12,weight:0,muscles:['זרועות']}
-    ]},
-    {type:base,name:s+' אינטרוולים',duration:40,distance:null,pace:null,zone:4},
-    null,
-    {type:base,name:s+' טמפו',duration:40,distance:null,pace:null,zone:3},
-    {type:'strength',name:'כוח: פלג גוף תחתון',exercises:[
-      {name:'סקוואט',sets:3,reps:10,weight:0,muscles:['רגליים','ליבה']},
-      {name:'דדליפט רומני',sets:3,reps:10,weight:0,muscles:['רגליים','גב','ליבה']},
-      {name:'לאנג׳',sets:3,reps:10,weight:0,muscles:['רגליים']},
-      {name:'עליות על ספסל',sets:3,reps:12,weight:0,muscles:['רגליים']}
-    ]},
-    {type:base,name:s+' ארוכה',duration:60,distance:null,pace:null,zone:2}
-  ];
-  store.set('ha_plan',{week:ymd(weekStart()),done:[],sessions});
+function createEmptyPlan(){
+  store.set('ha_plan',{week:ymd(weekStart()),done:[],sessions:[null,null,null,null,null,null,null]});
   renderPlan();
+  toast('תוכנית נוצרה – לחץ על כל יום כדי להגדיר אימון');
+}
+
+function deletePlan(){
+  localStorage.removeItem('ha_plan');
+  renderPlan();
+  toast('התוכנית נמחקה');
 }
 
 function togglePlan(i){
@@ -756,7 +881,6 @@ function editPlanDay(dayIdx){
   const plan=store.get('ha_plan',null);
   const session=plan?.sessions?.[dayIdx]||null;
   const isRest=!session;
-  const content=$('plan-edit-content');
   $('plan-edit-title').textContent='עריכת '+DAYS[dayIdx];
 
   let html=`<div class="field"><label>סוג אימון</label>
@@ -768,7 +892,7 @@ function editPlanDay(dayIdx){
 <option value="strength"${session?.type==='strength'?' selected':''}>כוח</option>
 </select></div>
 <div id="pe-fields"></div>`;
-  content.innerHTML=html;
+  $('plan-edit-content').innerHTML=html;
   $('plan-edit-modal').classList.add('show');
   updatePlanEditForm(session);
 }
@@ -777,7 +901,7 @@ function closePlanEdit(){$('plan-edit-modal').classList.remove('show')}
 function updatePlanEditForm(session){
   const type=$('pe-type').value;
   const f=$('pe-fields');
-  if(type==='rest'){f.innerHTML='<p style="text-align:center;color:var(--text2);padding:20px">יום מנוחה פעילה – מתיחות או הליכה קלה</p>';return}
+  if(type==='rest'){f.innerHTML='<p style="text-align:center;color:var(--text2);padding:20px">יום מנוחה</p>';return}
   if(type==='strength'){
     const exs=session?.type==='strength'&&session?.exercises?session.exercises:[{name:'',sets:3,reps:10,weight:0,muscles:[]}];
     f.innerHTML=`<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'אימון כוח')}" placeholder="אימון A"></div>
@@ -819,8 +943,8 @@ function addExerciseRow(){
 }
 
 function savePlanSession(){
-  const plan=store.get('ha_plan');
-  if(!plan)return;
+  let plan=store.get('ha_plan');
+  if(!plan){plan={week:ymd(weekStart()),done:[],sessions:[null,null,null,null,null,null,null]};}
   const type=$('pe-type').value;
   if(type==='rest'){plan.sessions[editingDay]=null}
   else if(type==='strength'){
@@ -847,6 +971,153 @@ function savePlanSession(){
   toast('האימון עודכן');
 }
 
+// --- SLEEP ---
+function loadSleep(){
+  const sleepData=store.get('ha_sleep',[]);
+  if(!sleepData.length){
+    $('sleep-content').innerHTML=`<div class="empty"><div class="empty-icon">${iconHtml('#i-moon','icon-lg')}</div><p>סנכרן נתונים מ-Garmin כדי לראות נתוני שינה</p><button class="btn primary" onclick="syncGarmin()">סנכרן עכשיו</button></div>`;
+    return;
+  }
+  const last=sleepData[sleepData.length-1];
+  const hrs=last.duration?Math.floor(last.duration/60):0;
+  const mins=last.duration?Math.round(last.duration%60):0;
+  const deep=last.deepSleep||0,light=last.lightSleep||0,rem=last.remSleep||0;
+  const total=deep+light+rem||1;
+  const quality=last.quality||0;
+
+  let html=`<div class="card sleep-hero">
+<div class="sh-val">${hrs}:${String(mins).padStart(2,'0')}</div>
+<div class="sh-label">שעות שינה אחרונה</div>
+<div class="sleep-quality"><span class="sq-score">${quality}</span><span class="sq-label">/ 100 איכות</span></div>
+<div class="sleep-stages">
+<div style="width:${deep/total*100}%;background:#1a3a6b" title="שינה עמוקה"></div>
+<div style="width:${light/total*100}%;background:#5b9bd5" title="שינה קלה"></div>
+<div style="width:${rem/total*100}%;background:#9b59b6" title="REM"></div>
+</div>
+<div class="sleep-stages-legend">
+<span class="ss-deep">עמוקה ${Math.round(deep)} דק׳</span>
+<span class="ss-light">קלה ${Math.round(light)} דק׳</span>
+<span class="ss-rem">REM ${Math.round(rem)} דק׳</span>
+</div>
+</div>`;
+
+  // trend
+  const recent=sleepData.slice(-7);
+  if(recent.length>1){
+    const maxDur=Math.max(...recent.map(s=>s.duration||0),1);
+    html+=`<div class="card"><div class="card-title">מגמת שינה (7 לילות אחרונים)</div>
+<div class="bars">${recent.map((s,i)=>{
+  const h=s.duration?Math.round(s.duration/60*10)/10:0;
+  return`<div class="bar-col${i===recent.length-1?' today':''}"><div style="font-size:11px">${h}</div><div class="bar" style="height:${Math.round((s.duration||0)/maxDur*80)}px;background:var(--ring-sleep)"></div><div>${s.date?.slice(5)||''}</div></div>`;
+}).join('')}</div></div>`;
+  }
+
+  // averages
+  const avgDur=Math.round(sleepData.reduce((s,d)=>s+(d.duration||0),0)/sleepData.length);
+  const avgQuality=Math.round(sleepData.reduce((s,d)=>s+(d.quality||0),0)/sleepData.length);
+  html+=`<div class="row3" style="margin-top:12px">
+<div class="stat"><b>${Math.floor(avgDur/60)}:${String(Math.round(avgDur%60)).padStart(2,'0')}</b><span>ממוצע שינה</span></div>
+<div class="stat"><b>${avgQuality}</b><span>ממוצע איכות</span></div>
+<div class="stat"><b>${sleepData.length}</b><span>לילות</span></div>
+</div>`;
+
+  $('sleep-content').innerHTML=html;
+}
+
+// --- HEART ---
+function loadHeart(){
+  const summaries=store.get('ha_daily_summaries',[]);
+  const hrvData=store.get('ha_hrv',[]);
+  if(!summaries.length&&!hrvData.length){
+    $('heart-content').innerHTML=`<div class="empty"><div class="empty-icon">${iconHtml('#i-heart','icon-lg')}</div><p>סנכרן נתונים מ-Garmin כדי לראות נתוני לב</p><button class="btn primary" onclick="syncGarmin()">סנכרן עכשיו</button></div>`;
+    return;
+  }
+  let html='';
+  const today=ymd(new Date());
+  const todaySummary=summaries.find(s=>s.date===today)||summaries[summaries.length-1]||{};
+
+  // Resting HR
+  const rhr=todaySummary.restingHeartRate||0;
+  html+=`<div class="card heart-big"><div class="hb-val" style="color:var(--ring-hr)">${rhr}</div><div class="hb-unit">bpm</div><div class="hb-label">דופק מנוחה</div></div>`;
+
+  // RHR trend
+  const recentSummaries=summaries.slice(-7);
+  if(recentSummaries.length>1){
+    const maxHr=Math.max(...recentSummaries.map(s=>s.restingHeartRate||0),1);
+    html+=`<div class="card"><div class="card-title">מגמת דופק מנוחה</div>
+<div class="bars">${recentSummaries.map((s,i)=>`<div class="bar-col${i===recentSummaries.length-1?' today':''}"><div>${s.restingHeartRate||''}</div><div class="bar" style="height:${Math.round((s.restingHeartRate||0)/maxHr*80)}px;background:var(--ring-hr)"></div><div>${s.date?.slice(5)||''}</div></div>`).join('')}</div></div>`;
+  }
+
+  // HRV
+  if(hrvData.length){
+    const lastHrv=hrvData[hrvData.length-1];
+    html+=`<div class="card heart-big"><div class="hb-val" style="color:var(--ring-hrv)">${lastHrv.lastNight||lastHrv.weeklyAvg||0}</div><div class="hb-unit">ms</div><div class="hb-label">HRV</div></div>`;
+    if(hrvData.length>1){
+      const recent=hrvData.slice(-7);
+      const maxV=Math.max(...recent.map(h=>h.lastNight||h.weeklyAvg||0),1);
+      html+=`<div class="card"><div class="card-title">מגמת HRV</div>
+<div class="bars">${recent.map((h,i)=>{const v=h.lastNight||h.weeklyAvg||0;return`<div class="bar-col${i===recent.length-1?' today':''}"><div>${v}</div><div class="bar" style="height:${Math.round(v/maxV*80)}px;background:var(--ring-hrv)"></div><div>${h.date?.slice(5)||''}</div></div>`}).join('')}</div></div>`;
+    }
+  }
+
+  // Stress / Body Battery
+  if(todaySummary.stressLevel||todaySummary.bodyBattery){
+    html+=`<div class="row" style="margin-top:12px">`;
+    if(todaySummary.stressLevel)html+=`<div class="stat"><b>${todaySummary.stressLevel}</b><span>מתח</span></div>`;
+    if(todaySummary.bodyBattery)html+=`<div class="stat"><b>${todaySummary.bodyBattery}</b><span>Body Battery</span></div>`;
+    html+=`</div>`;
+  }
+
+  $('heart-content').innerHTML=html;
+}
+
+// --- ACTIVITY ---
+function loadActivity(){
+  const summaries=store.get('ha_daily_summaries',[]);
+  if(!summaries.length){
+    $('activity-content').innerHTML=`<div class="empty"><div class="empty-icon">${iconHtml('#i-steps','icon-lg')}</div><p>סנכרן נתונים מ-Garmin כדי לראות נתוני פעילות</p><button class="btn primary" onclick="syncGarmin()">סנכרן עכשיו</button></div>`;
+    return;
+  }
+  const today=ymd(new Date());
+  const todaySummary=summaries.find(s=>s.date===today)||summaries[summaries.length-1]||{};
+  let html='';
+
+  // Steps big
+  const steps=todaySummary.steps||0;
+  html+=`<div class="card activity-big"><div class="ab-val">${steps>=1000?(steps/1000).toFixed(1)+'k':steps}</div><div class="ab-label">צעדים היום</div></div>`;
+
+  // Steps trend
+  const recent=summaries.slice(-7);
+  if(recent.length>1){
+    const maxS=Math.max(...recent.map(s=>s.steps||0),1);
+    html+=`<div class="card"><div class="card-title">מגמת צעדים</div>
+<div class="bars">${recent.map((s,i)=>{const v=s.steps||0;return`<div class="bar-col${i===recent.length-1?' today':''}"><div>${v>=1000?(v/1000).toFixed(1)+'k':v}</div><div class="bar" style="height:${Math.round(v/maxS*80)}px;background:var(--ring-steps)"></div><div>${s.date?.slice(5)||''}</div></div>`}).join('')}</div></div>`;
+  }
+
+  // Stats row
+  const calories=todaySummary.calories||todaySummary.totalCalories||0;
+  const activeMin=todaySummary.activeMinutes||todaySummary.moderateIntensityMinutes||0;
+  const dist=todaySummary.totalDistance?Math.round(todaySummary.totalDistance/100)/10:0;
+  html+=`<div class="row3" style="margin-top:12px">
+<div class="stat"><b>${calories}</b><span>קלוריות</span></div>
+<div class="stat"><b>${activeMin}</b><span>דק׳ פעילות</span></div>
+<div class="stat"><b>${dist}</b><span>ק״מ</span></div>
+</div>`;
+
+  // Weekly comparison
+  const weekData=summaries.slice(-7);
+  const prevWeek=summaries.slice(-14,-7);
+  if(prevWeek.length){
+    const twSteps=weekData.reduce((s,d)=>s+(d.steps||0),0);
+    const lwSteps=prevWeek.reduce((s,d)=>s+(d.steps||0),0);
+    const diff=twSteps-lwSteps;
+    html+=`<div class="card" style="margin-top:12px"><div class="card-title">השוואה שבועית</div>
+<p style="font-size:14px;color:var(--text2)">${(twSteps/1000).toFixed(0)}k צעדים השבוע ${diff>=0?'(+':'('+(diff/1000).toFixed(0)}k${diff>=0?(diff/1000).toFixed(0)+'k':''} מהשבוע הקודם)</p></div>`;
+  }
+
+  $('activity-content').innerHTML=html;
+}
+
 // --- Workout Mode ---
 let wo={dayIdx:-1,session:null,sets:[],currentEx:0};
 
@@ -866,6 +1137,7 @@ function startWorkout(dayIdx){
   $('tab-bar').classList.remove('show');
   $('fab').classList.remove('show');
   document.body.style.overflow='hidden';
+  initSwipe();
 }
 
 function getLastWorkoutSets(exName,setIdx){
@@ -930,7 +1202,12 @@ ${sets.map((set,si)=>`<div class="wo-set${set.done?' completed':''}">
 </div>`).join('')}
 <div class="wo-card-actions">
 <button onclick="skipExercise(${ei})">דלג על התרגיל</button>
-<button onclick="replaceExercise(${ei})">החלף תרגיל</button>
+<button onclick="showReplaceExercise(${ei})">החלף תרגיל</button>
+</div>
+<div class="wo-replace-input" id="wo-replace-${ei}" hidden>
+<input class="input" placeholder="שם תרגיל חדש" id="wo-replace-name-${ei}">
+<button style="background:var(--accent);color:#fff" onclick="confirmReplace(${ei})">החלף</button>
+<button style="background:var(--card)" onclick="$('wo-replace-${ei}').hidden=true">ביטול</button>
 </div>
 </div></div>`;
   }).join('');
@@ -946,8 +1223,39 @@ function adjSet(ei,si,field,delta){
 function skipExercise(ei){
   if(ei<wo.session.exercises.length-1){wo.currentEx=ei+1;renderWorkout()}
 }
-function replaceExercise(ei){
-  const name=prompt_inline(ei);
+
+function showReplaceExercise(ei){
+  renderWorkout();
+  const el=$('wo-replace-'+ei);
+  if(el){el.hidden=false;$('wo-replace-name-'+ei).focus();}
+}
+function confirmReplace(ei){
+  const name=$('wo-replace-name-'+ei)?.value.trim();
+  if(!name)return;
+  wo.session.exercises[ei].name=name;
+  renderWorkout();
+  toast('התרגיל הוחלף');
+}
+
+// Swipe support
+function initSwipe(){
+  const carousel=$('wo-carousel');
+  let startX=0,startY=0,moving=false;
+  carousel.ontouchstart=e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;moving=true};
+  carousel.ontouchmove=e=>{
+    if(!moving)return;
+    const dx=e.touches[0].clientX-startX;
+    const dy=e.touches[0].clientY-startY;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10)e.preventDefault();
+  };
+  carousel.ontouchend=e=>{
+    if(!moving)return;moving=false;
+    const dx=e.changedTouches[0].clientX-startX;
+    if(Math.abs(dx)<50)return;
+    // RTL: swipe left = next (positive dx in RTL), swipe right = prev
+    if(dx>50&&wo.currentEx<wo.session.exercises.length-1){wo.currentEx++;renderWorkout()}
+    else if(dx<-50&&wo.currentEx>0){wo.currentEx--;renderWorkout()}
+  };
 }
 
 function getExerciseHistory(exName){
@@ -968,10 +1276,7 @@ function suggestWeight(exName,currentSets){
     const ex=logs[i].exercises?.find(e=>e.name===exName);
     if(ex&&ex.sets.length){
       const maxW=Math.max(...ex.sets.map(s=>s.weight));
-      if(maxW>0){
-        const next=maxW+2.5;
-        return 'מוכן ל-'+next+' ק״ג?';
-      }
+      if(maxW>0)return 'מוכן ל-'+(maxW+2.5)+' ק״ג?';
     }
   }
   return null;
@@ -1018,12 +1323,13 @@ function loadSettings(){
   ['age','height','weight'].forEach(k=>$('s-'+k).textContent=profile[k]||'—');
   $('s-goals').textContent=(profile.goals||[]).map(g=>GOALS[g]||g).join(', ')||'לא נבחרו';
   const hasKey=!!store.get('ha_api_key','');
-  $('s-api-status').innerHTML=hasKey?'<span class="setting-badge on">מחובר ✓</span>':'<span class="setting-badge off">לא מוגדר</span>';
-  $('sync-btn').hidden=!hasKey;
+  $('s-api-status').innerHTML=hasKey?'<span class="setting-badge on">מחובר</span>':'<span class="setting-badge off">לא מוגדר</span>';
+  const lastSync=store.get('ha_last_sync','');
+  $('s-last-sync').textContent=lastSync?new Date(lastSync).toLocaleDateString('he-IL',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}):'לא בוצע';
 }
 function askReset(on){$('reset-confirm').hidden=!on;$('reset-btn').hidden=on}
 function resetApp(){
-  ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs'].forEach(k=>localStorage.removeItem(k));
+  ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs','ha_daily_summaries','ha_sleep','ha_hrv','ha_weight','ha_last_sync'].forEach(k=>localStorage.removeItem(k));
   profile=null;fillForm(null);show('welcome');
 }
 
@@ -1032,15 +1338,13 @@ const SYNC_URL='https://gytxwjlicawlfdehszil.supabase.co/functions/v1/garmin-syn
 async function syncGarmin(){
   const apiKey=store.get('ha_api_key','');
   if(!apiKey){toast('צריך להגדיר מפתח API קודם');return}
-  const btn=$('sync-btn'),prog=$('sync-progress'),msg=$('sync-msg');
-  btn.disabled=true;btn.style.opacity='.5';
-  prog.hidden=false;msg.textContent='מתחבר ל-Garmin...';
+  const prog=$('sync-progress'),msg=$('sync-msg');
+  prog.hidden=false;msg.textContent='מתחבר ל-Garmin...';msg.style.color='';
   try{
     const res=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey,daysBack:90})});
     const data=await res.json();
     if(!res.ok||data.error){msg.textContent='שגיאה: '+(data.error||'תשובה לא תקינה');msg.style.color='var(--red)';return}
     msg.textContent='מעבד נתונים...';
-    // Map Garmin activity types to our types
     const typeMap={running:'running',cycling:'cycling',swimming:'swimming',lap_swimming:'swimming',
       open_water_swimming:'swimming',strength_training:'gym',walking:'walking',hiking:'hiking',
       trail_running:'running',treadmill_running:'running',indoor_cycling:'cycling',mountain_biking:'cycling'};
@@ -1056,23 +1360,21 @@ async function syncGarmin(){
       added++;
     }
     if(added)store.set('ha_activities',newActs);
-    // Save health data
     if(data.dailySummaries?.length)store.set('ha_daily_summaries',data.dailySummaries);
     if(data.sleep?.length)store.set('ha_sleep',data.sleep);
     if(data.hrv?.length)store.set('ha_hrv',data.hrv);
     if(data.weight?.length)store.set('ha_weight',data.weight);
     store.set('ha_last_sync',new Date().toISOString());
     msg.style.color='var(--accent)';
-    msg.textContent=`סנכרון הושלם: ${added} אימונים חדשים, ${(data.dailySummaries||[]).length} ימים`;
+    msg.textContent=`סנכרון הושלם: ${added} אימונים, ${(data.dailySummaries||[]).length} ימים`;
     refresh();
   }catch(e){
     msg.textContent='שגיאת רשת: '+e.message;msg.style.color='var(--red)';
   }finally{
-    btn.disabled=false;btn.style.opacity='1';
     setTimeout(()=>{prog.hidden=true;msg.style.color=''},8000);
   }
 }
 
-profile?.name?show('today'):(fillForm(null),show('welcome'));
+profile?.name?show('home'):(fillForm(null),show('welcome'));
 </script>
 </body></html>
