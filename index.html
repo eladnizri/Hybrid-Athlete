@@ -417,6 +417,8 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <main id="workouts-screen" class="screen">
 <div class="head"><h1>אימונים</h1><p class="sub" id="plan-sub">תוכנית ואימונים אחרונים</p></div>
 <div id="plan-content"></div>
+<h2>תבניות אימוני כוח</h2>
+<div id="templates-list"></div>
 <h2>אימונים אחרונים</h2>
 <div id="activities-list"></div>
 </main>
@@ -660,10 +662,10 @@ function loadHome(){
   }
 
   // Health gauges
-  const hrv=lastHrv?.lastNight||lastHrv?.weeklyAvg||0;
-  const rhr=todaySummary?.restingHeartRate||0;
+  const hrv=lastHrv?.lastNightAvg||lastHrv?.weeklyAvg||0;
+  const rhr=todaySummary?.restingHr||0;
   const steps=todaySummary?.steps||0;
-  const sleepHrs=lastSleep?.duration?Math.round(lastSleep.duration/60*10)/10:0;
+  const sleepHrs=lastSleep?.totalSleep?Math.round(lastSleep.totalSleep/60*10)/10:0;
 
   $('health-gauges').innerHTML=[
     {val:sleepHrs,unit:'ש׳',label:'שינה',icon:'#i-moon',color:'var(--ring-sleep)',max:10,fmt:v=>v.toFixed(1)},
@@ -700,14 +702,14 @@ stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" transform="rotate(-90 4
 
 function computeBodyStatus(summary,sleep,hrv){
   let score=0,factors=0;
-  if(sleep?.quality){score+=sleep.quality;factors++}
-  if(hrv?.lastNight){
-    const avg=hrv.weeklyAvg||hrv.lastNight;
-    score+=hrv.lastNight>=avg*0.9?80:60;
+  if(sleep?.score){score+=sleep.score;factors++}
+  if(hrv?.lastNightAvg){
+    const avg=hrv.weeklyAvg||hrv.lastNightAvg;
+    score+=hrv.lastNightAvg>=avg*0.9?80:60;
     factors++;
   }
-  if(summary?.bodyBattery){score+=summary.bodyBattery;factors++}
-  if(summary?.stressLevel){score+=Math.max(0,100-summary.stressLevel);factors++}
+  if(summary?.bodyBatteryMax){score+=summary.bodyBatteryMax;factors++}
+  if(summary?.stress){score+=Math.max(0,100-summary.stress);factors++}
   const avg=factors?Math.round(score/factors):70;
   if(avg>=80)return{title:'מצוין – הגוף מאושש',sub:'קדימה, יום מוצלח'};
   if(avg>=60)return{title:'טוב – מוכנות סבירה',sub:'אפשר להתאמן, תקשיב לגוף'};
@@ -766,9 +768,43 @@ function renderWeeklySummary(){
 // --- WORKOUTS (אימונים) ---
 function loadWorkouts(){
   renderPlan();
+  renderTemplates();
   const all=acts();
   $('activities-list').innerHTML=listHtml(all.slice(0,10),
     `<div class="empty-icon">${iconHtml('#i-run','icon-lg')}</div><p>כאן יופיעו האימונים שלך</p><button class="btn primary" onclick="openAddActivity()">הוסף אימון ראשון</button>`);
+}
+function renderTemplates(){
+  const templates=getTemplates();
+  const el=$('templates-list');if(!el)return;
+  if(!templates.length){el.innerHTML='<p style="color:var(--text2);font-size:14px;text-align:center;padding:8px">צור תבנית כוח דרך עריכת יום בתוכנית</p>';return}
+  el.innerHTML=templates.map(t=>`<div class="activity-card" style="cursor:pointer" onclick="editTemplate(${t.id})">
+<div class="act-icon" style="background:var(--accent-light)">${iconHtml('#i-gym')}</div>
+<div class="act-info"><div class="act-name">${esc(t.name)}</div><div class="act-detail">${t.exercises.length} תרגילים</div></div>
+<button style="background:none;border:none;padding:8px;min-height:44px;color:var(--red)" onclick="event.stopPropagation();deleteTemplate(${t.id});loadWorkouts()" aria-label="מחק">${iconHtml('#i-close')}</button>
+</div>`).join('');
+}
+function editTemplate(id){
+  const tmpl=getTemplates().find(t=>t.id===id);if(!tmpl)return;
+  editingDay=-1;
+  $('plan-edit-title').textContent='עריכת תבנית: '+tmpl.name;
+  $('plan-edit-content').innerHTML=`<div class="field"><label for="pe-name">שם התבנית</label><input class="input" id="pe-name" value="${esc(tmpl.name)}"></div>
+<h3 style="margin:12px 0 8px">תרגילים</h3>
+<div id="pe-exercises">${tmpl.exercises.map((ex,i)=>exerciseRowHtml(i,ex)).join('')}</div>
+<button type="button" class="add-exercise-btn" onclick="addExerciseRow()">+ הוסף תרגיל</button>`;
+  $('plan-edit-modal').classList.add('show');
+  // Override save to save template
+  $('plan-edit-modal').querySelector('.btn.primary').onclick=()=>{
+    const rows=$('pe-exercises').querySelectorAll('.exercise-row');
+    const exercises=[...rows].map(r=>({
+      name:r.querySelector('.ex-name').value.trim(),
+      sets:parseInt(r.querySelector('.ex-sets').value)||3,
+      reps:parseInt(r.querySelector('.ex-reps').value)||10,
+      weight:parseFloat(r.querySelector('.ex-weight').value)||0,
+      muscles:r.querySelector('.ex-muscles').value.split(',').map(s=>s.trim()).filter(Boolean)
+    })).filter(e=>e.name);
+    saveTemplate({id,name:$('pe-name').value.trim()||tmpl.name,exercises});
+    closePlanEdit();loadWorkouts();toast('התבנית עודכנה');
+  };
 }
 
 function sessionDesc(s){
@@ -819,6 +855,39 @@ function saveActivity(){
   toast('האימון נשמר',()=>{store.set('ha_activities',acts().filter(a=>a.id!==act.id));refresh()});
 }
 function refresh(){loadHome();loadWorkouts()}
+
+// --- Strength Templates ---
+function getTemplates(){return store.get('ha_strength_templates',[])}
+function saveTemplate(tmpl){
+  const templates=getTemplates();
+  const idx=templates.findIndex(t=>t.id===tmpl.id);
+  if(idx>=0)templates[idx]=tmpl;else templates.push(tmpl);
+  store.set('ha_strength_templates',templates);
+}
+function deleteTemplate(id){
+  store.set('ha_strength_templates',getTemplates().filter(t=>t.id!==id));
+}
+function loadTemplate(){
+  const sel=$('pe-template');if(!sel)return;
+  const tmpl=getTemplates().find(t=>t.id===+sel.value);if(!tmpl)return;
+  $('pe-name').value=tmpl.name;
+  $('pe-exercises').innerHTML=tmpl.exercises.map((ex,i)=>exerciseRowHtml(i,ex)).join('');
+  toast('תבנית נטענה');
+}
+function saveAsTemplate(){
+  const rows=$('pe-exercises')?.querySelectorAll('.exercise-row');if(!rows)return;
+  const name=$('pe-name')?.value.trim()||'אימון כוח';
+  const exercises=[...rows].map(r=>({
+    name:r.querySelector('.ex-name').value.trim(),
+    sets:parseInt(r.querySelector('.ex-sets').value)||3,
+    reps:parseInt(r.querySelector('.ex-reps').value)||10,
+    weight:parseFloat(r.querySelector('.ex-weight').value)||0,
+    muscles:r.querySelector('.ex-muscles').value.split(',').map(s=>s.trim()).filter(Boolean)
+  })).filter(e=>e.name);
+  if(!exercises.length){toast('הוסף לפחות תרגיל אחד');return}
+  saveTemplate({id:Date.now(),name,exercises});
+  toast('התבנית "'+name+'" נשמרה');
+}
 
 // --- Plan ---
 function weekStart(){const s=new Date();s.setDate(s.getDate()-s.getDay());return s}
@@ -903,11 +972,17 @@ function updatePlanEditForm(session){
   const f=$('pe-fields');
   if(type==='rest'){f.innerHTML='<p style="text-align:center;color:var(--text2);padding:20px">יום מנוחה</p>';return}
   if(type==='strength'){
+    const templates=getTemplates();
     const exs=session?.type==='strength'&&session?.exercises?session.exercises:[{name:'',sets:3,reps:10,weight:0,muscles:[]}];
-    f.innerHTML=`<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'אימון כוח')}" placeholder="אימון A"></div>
+    const tmplOptions=templates.length?templates.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join(''):'';
+    f.innerHTML=`${templates.length?`<div class="field"><label>בחר תבנית קיימת</label>
+<div class="row"><select class="input" id="pe-template"><option value="">בנה ידנית</option>${tmplOptions}</select>
+<button type="button" class="btn" style="width:auto;min-height:48px;padding:0 16px;margin:0" onclick="loadTemplate()">טען</button></div></div>`:''}
+<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'אימון כוח')}" placeholder="אימון A"></div>
 <h3 style="margin:12px 0 8px">תרגילים</h3>
 <div id="pe-exercises">${exs.map((ex,i)=>exerciseRowHtml(i,ex)).join('')}</div>
-<button type="button" class="add-exercise-btn" onclick="addExerciseRow()">+ הוסף תרגיל</button>`;
+<button type="button" class="add-exercise-btn" onclick="addExerciseRow()">+ הוסף תרגיל</button>
+<button type="button" class="btn" style="margin-top:12px;font-size:14px" onclick="saveAsTemplate()">שמור כתבנית</button>`;
     return;
   }
   f.innerHTML=`<div class="field"><label for="pe-name">שם האימון</label><input class="input" id="pe-name" value="${esc(session?.name||'')}" placeholder="${TYPES[type]?.[1]||'אימון'}"></div>
@@ -979,11 +1054,11 @@ function loadSleep(){
     return;
   }
   const last=sleepData[sleepData.length-1];
-  const hrs=last.duration?Math.floor(last.duration/60):0;
-  const mins=last.duration?Math.round(last.duration%60):0;
-  const deep=last.deepSleep||0,light=last.lightSleep||0,rem=last.remSleep||0;
+  const hrs=last.totalSleep?Math.floor(last.totalSleep/60):0;
+  const mins=last.totalSleep?Math.round(last.totalSleep%60):0;
+  const deep=last.deep||0,light=last.light||0,rem=last.rem||0;
   const total=deep+light+rem||1;
-  const quality=last.quality||0;
+  const quality=last.score||0;
 
   let html=`<div class="card sleep-hero">
 <div class="sh-val">${hrs}:${String(mins).padStart(2,'0')}</div>
@@ -1004,17 +1079,17 @@ function loadSleep(){
   // trend
   const recent=sleepData.slice(-7);
   if(recent.length>1){
-    const maxDur=Math.max(...recent.map(s=>s.duration||0),1);
+    const maxDur=Math.max(...recent.map(s=>s.totalSleep||0),1);
     html+=`<div class="card"><div class="card-title">מגמת שינה (7 לילות אחרונים)</div>
 <div class="bars">${recent.map((s,i)=>{
-  const h=s.duration?Math.round(s.duration/60*10)/10:0;
-  return`<div class="bar-col${i===recent.length-1?' today':''}"><div style="font-size:11px">${h}</div><div class="bar" style="height:${Math.round((s.duration||0)/maxDur*80)}px;background:var(--ring-sleep)"></div><div>${s.date?.slice(5)||''}</div></div>`;
+  const h=s.totalSleep?Math.round(s.totalSleep/60*10)/10:0;
+  return`<div class="bar-col${i===recent.length-1?' today':''}"><div style="font-size:11px">${h}</div><div class="bar" style="height:${Math.round((s.totalSleep||0)/maxDur*80)}px;background:var(--ring-sleep)"></div><div>${s.date?.slice(5)||''}</div></div>`;
 }).join('')}</div></div>`;
   }
 
   // averages
-  const avgDur=Math.round(sleepData.reduce((s,d)=>s+(d.duration||0),0)/sleepData.length);
-  const avgQuality=Math.round(sleepData.reduce((s,d)=>s+(d.quality||0),0)/sleepData.length);
+  const avgDur=Math.round(sleepData.reduce((s,d)=>s+(d.totalSleep||0),0)/sleepData.length);
+  const avgQuality=Math.round(sleepData.reduce((s,d)=>s+(d.score||0),0)/sleepData.length);
   html+=`<div class="row3" style="margin-top:12px">
 <div class="stat"><b>${Math.floor(avgDur/60)}:${String(Math.round(avgDur%60)).padStart(2,'0')}</b><span>ממוצע שינה</span></div>
 <div class="stat"><b>${avgQuality}</b><span>ממוצע איכות</span></div>
@@ -1037,15 +1112,15 @@ function loadHeart(){
   const todaySummary=summaries.find(s=>s.date===today)||summaries[summaries.length-1]||{};
 
   // Resting HR
-  const rhr=todaySummary.restingHeartRate||0;
+  const rhr=todaySummary.restingHr||0;
   html+=`<div class="card heart-big"><div class="hb-val" style="color:var(--ring-hr)">${rhr}</div><div class="hb-unit">bpm</div><div class="hb-label">דופק מנוחה</div></div>`;
 
   // RHR trend
   const recentSummaries=summaries.slice(-7);
   if(recentSummaries.length>1){
-    const maxHr=Math.max(...recentSummaries.map(s=>s.restingHeartRate||0),1);
+    const maxHr=Math.max(...recentSummaries.map(s=>s.restingHr||0),1);
     html+=`<div class="card"><div class="card-title">מגמת דופק מנוחה</div>
-<div class="bars">${recentSummaries.map((s,i)=>`<div class="bar-col${i===recentSummaries.length-1?' today':''}"><div>${s.restingHeartRate||''}</div><div class="bar" style="height:${Math.round((s.restingHeartRate||0)/maxHr*80)}px;background:var(--ring-hr)"></div><div>${s.date?.slice(5)||''}</div></div>`).join('')}</div></div>`;
+<div class="bars">${recentSummaries.map((s,i)=>`<div class="bar-col${i===recentSummaries.length-1?' today':''}"><div>${s.restingHr||''}</div><div class="bar" style="height:${Math.round((s.restingHr||0)/maxHr*80)}px;background:var(--ring-hr)"></div><div>${s.date?.slice(5)||''}</div></div>`).join('')}</div></div>`;
   }
 
   // HRV
@@ -1061,10 +1136,10 @@ function loadHeart(){
   }
 
   // Stress / Body Battery
-  if(todaySummary.stressLevel||todaySummary.bodyBattery){
+  if(todaySummary.stress||todaySummary.bodyBatteryMax){
     html+=`<div class="row" style="margin-top:12px">`;
-    if(todaySummary.stressLevel)html+=`<div class="stat"><b>${todaySummary.stressLevel}</b><span>מתח</span></div>`;
-    if(todaySummary.bodyBattery)html+=`<div class="stat"><b>${todaySummary.bodyBattery}</b><span>Body Battery</span></div>`;
+    if(todaySummary.stress)html+=`<div class="stat"><b>${todaySummary.stress}</b><span>מתח</span></div>`;
+    if(todaySummary.bodyBatteryMax)html+=`<div class="stat"><b>${todaySummary.bodyBatteryMax}</b><span>Body Battery</span></div>`;
     html+=`</div>`;
   }
 
@@ -1329,7 +1404,7 @@ function loadSettings(){
 }
 function askReset(on){$('reset-confirm').hidden=!on;$('reset-btn').hidden=on}
 function resetApp(){
-  ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs','ha_daily_summaries','ha_sleep','ha_hrv','ha_weight','ha_last_sync'].forEach(k=>localStorage.removeItem(k));
+  ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs','ha_daily_summaries','ha_sleep','ha_hrv','ha_weight','ha_last_sync','ha_strength_templates'].forEach(k=>localStorage.removeItem(k));
   profile=null;fillForm(null);show('welcome');
 }
 
