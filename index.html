@@ -398,6 +398,8 @@ display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px
 <div class="goals-row"><span>API</span><span id="s-api-status"></span></div>
 </div>
 <button class="btn" onclick="openEdit()">עריכת פרטים</button>
+<button class="btn" id="sync-btn" onclick="syncGarmin()" hidden><svg class="icon" style="vertical-align:-3px"><use href="#i-bolt"/></svg> סנכרן מ-Garmin</button>
+<div class="card" id="sync-progress" hidden><p id="sync-msg" style="text-align:center"></p></div>
 <button class="btn danger" id="reset-btn" onclick="askReset(true)">איפוס נתונים</button>
 <div class="card" id="reset-confirm" style="margin-top:12px" hidden>
 <p>כל האימונים והפרטים יימחקו מהמכשיר הזה. אי אפשר לשחזר אותם.</p>
@@ -1017,11 +1019,58 @@ function loadSettings(){
   $('s-goals').textContent=(profile.goals||[]).map(g=>GOALS[g]||g).join(', ')||'לא נבחרו';
   const hasKey=!!store.get('ha_api_key','');
   $('s-api-status').innerHTML=hasKey?'<span class="setting-badge on">מחובר ✓</span>':'<span class="setting-badge off">לא מוגדר</span>';
+  $('sync-btn').hidden=!hasKey;
 }
 function askReset(on){$('reset-confirm').hidden=!on;$('reset-btn').hidden=on}
 function resetApp(){
   ['ha_profile','ha_activities','ha_plan','ha_api_key','ha_workout_logs'].forEach(k=>localStorage.removeItem(k));
   profile=null;fillForm(null);show('welcome');
+}
+
+// --- Garmin Sync ---
+const SYNC_URL='https://gytxwjlicawlfdehszil.supabase.co/functions/v1/garmin-sync';
+async function syncGarmin(){
+  const apiKey=store.get('ha_api_key','');
+  if(!apiKey){toast('צריך להגדיר מפתח API קודם');return}
+  const btn=$('sync-btn'),prog=$('sync-progress'),msg=$('sync-msg');
+  btn.disabled=true;btn.style.opacity='.5';
+  prog.hidden=false;msg.textContent='מתחבר ל-Garmin...';
+  try{
+    const res=await fetch(SYNC_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiKey,daysBack:90})});
+    const data=await res.json();
+    if(!res.ok||data.error){msg.textContent='שגיאה: '+(data.error||'תשובה לא תקינה');msg.style.color='var(--red)';return}
+    msg.textContent='מעבד נתונים...';
+    // Map Garmin activity types to our types
+    const typeMap={running:'running',cycling:'cycling',swimming:'swimming',lap_swimming:'swimming',
+      open_water_swimming:'swimming',strength_training:'gym',walking:'walking',hiking:'hiking',
+      trail_running:'running',treadmill_running:'running',indoor_cycling:'cycling',mountain_biking:'cycling'};
+    const existing=acts();
+    const existingDates=new Set(existing.map(a=>a.date+a.type+(a.duration||'')));
+    let added=0;
+    const newActs=[...existing];
+    for(const a of data.activities||[]){
+      const type=typeMap[a.type]||'other';
+      const key=a.date+type+(a.duration||'');
+      if(existingDates.has(key))continue;
+      newActs.push({id:Date.now()+added,type,name:a.name||null,date:a.date,duration:a.duration,distance:a.distance,hr:a.hr,calories:a.calories});
+      added++;
+    }
+    if(added)store.set('ha_activities',newActs);
+    // Save health data
+    if(data.dailySummaries?.length)store.set('ha_daily_summaries',data.dailySummaries);
+    if(data.sleep?.length)store.set('ha_sleep',data.sleep);
+    if(data.hrv?.length)store.set('ha_hrv',data.hrv);
+    if(data.weight?.length)store.set('ha_weight',data.weight);
+    store.set('ha_last_sync',new Date().toISOString());
+    msg.style.color='var(--accent)';
+    msg.textContent=`סנכרון הושלם: ${added} אימונים חדשים, ${(data.dailySummaries||[]).length} ימים`;
+    refresh();
+  }catch(e){
+    msg.textContent='שגיאת רשת: '+e.message;msg.style.color='var(--red)';
+  }finally{
+    btn.disabled=false;btn.style.opacity='1';
+    setTimeout(()=>{prog.hidden=true;msg.style.color=''},8000);
+  }
 }
 
 profile?.name?show('today'):(fillForm(null),show('welcome'));
